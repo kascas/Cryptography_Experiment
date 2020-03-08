@@ -1,5 +1,5 @@
 import math
-
+import os
 
 def Era():
     n = int(input("input n= "))
@@ -21,3 +21,4 @@ def Era():
 
 
 Era()
+os.system("pause")

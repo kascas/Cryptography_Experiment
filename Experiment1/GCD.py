@@ -1,3 +1,6 @@
+import os
+
+
 def GCD(a, b):
     x1, y1, x2, y2 = 1, 0, 0, 1
     t1, t2 = 0, 0
@@ -22,3 +25,4 @@ print("gcd(a,b)= {}".format(L[0]))
 print("x= {}\ny= {}".format(L[1], L[2]))
 print("a*x= " + str(L[1] * a))
 print("b*y= " + str(L[2] * b))
+os.system("pause")

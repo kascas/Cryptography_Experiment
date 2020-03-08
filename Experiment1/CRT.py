@@ -1,4 +1,5 @@
 from numtheory import GCD
+import os
 
 def CRT(b, m, n):
     mm = 1;
@@ -30,3 +31,4 @@ for i in range(n):
     b.append(int(input()))
 result = CRT(b, m, n)
 print("result= {}".format(result))
+os.system("pause")

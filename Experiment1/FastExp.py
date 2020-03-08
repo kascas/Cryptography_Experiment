@@ -1,3 +1,6 @@
+import os
+
+
 def FastExp(x, n, m):
     d = 1
     while n > 0:
@@ -15,3 +18,4 @@ n = int(input("n= "))
 m = int(input("m= "))
 result = FastExp(x, n, m)
 print("result= {}".format(result))
+os.system("pause")

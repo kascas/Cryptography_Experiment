@@ -1,5 +1,6 @@
 import random
-from numtheory import FastExp
+import os
+from Numtheory import FastExp
 
 
 def MR_test(p, r):
@@ -34,11 +35,12 @@ def MR_test(p, r):
 
 p = int(input("p= "))
 num = int(input("how many times do you want to test: "))
-r_list = random.sample(range(2, p - 1), num)
 judge = 0
 for i in range(num):
-    judge += MR_test(p, r_list[i])
+    r = random.randint(2, p - 1)
+    judge += MR_test(p, r)
 if (judge == 0):
     print(">>> True")
 else:
     print(">>> False")
+os.system("pause")
