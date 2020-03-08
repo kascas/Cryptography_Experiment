@@ -1,6 +1,5 @@
 from numtheory import GCD
 
-
 def CRT(b, m, n):
     mm = 1;
     bm = 0;
@@ -20,7 +19,7 @@ def CRT(b, m, n):
     return result
 
 
-b = [];
+b = []
 m = []
 n = int(input("num of CRT is: "))
 for i in range(n):
