@@ -2,10 +2,10 @@ from numtheory import GCD
 import os
 
 def CRT(b, m, n):
-    mm = 1;
-    bm = 0;
-    bmp = 0;
-    result = 0;
+    mm = 1
+    bm = 0
+    bmp = 0
+    result = 0
     temp = 0
     for i in range(n):
         mm *= m[i]

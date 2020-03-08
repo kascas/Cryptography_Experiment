@@ -5,8 +5,8 @@ from Numtheory import FastExp
 
 def MR_test(p, r):
     pt = p_1 = p - 1
-    temp = 2;
-    k = 0;
+    temp = 2
+    k = 0
     judge = 0
     while (pt % temp) == 0:
         temp *= 2
