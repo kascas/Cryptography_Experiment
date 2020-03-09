@@ -1,4 +1,4 @@
-from numtheory import GCD
+from Numtheory import GCD
 import os
 
 def CRT(b, m, n):
@@ -14,7 +14,7 @@ def CRT(b, m, n):
         bmp = GCD(bm, m[i])[1]
         temp = bm * bmp * b[i]
         result = (result + temp) % mm
-    if result < 0:
+    if result <= 0:
         temp = (result * (-1)) // mm + 1
         result = temp * mm + result
     return result
