@@ -35,9 +35,18 @@ def MR_test(p, r):
 
 p = int(input("p= "))
 num = int(input("how many times do you want to test: "))
+r_list = []
 judge = 0
 for i in range(num):
-    r = random.randint(2, p - 1)
+    while (1):
+        k = 0
+        r = random.randint(2, p - 1)
+        for j in range(len(r_list)):
+            if r_list[j] == r:
+                k += 1
+        if (k == 0):
+            break
+    r_list.append(r)
     judge += MR_test(p, r)
 if (judge == 0):
     print(">>> True")
