@@ -4,13 +4,11 @@ import time
 
 def FastExp(x, n, m):
     d = 1
-    #if n%2==1,compute (d*x)%m,else only do (x*x)%m
+    # if n%2==1,compute (d*x)%m,else only do (x*x)%m
     while n > 0:
-        if (n % 2) == 1:
+        if n & 1:
             d = (d * x) % m
-            n = (n - 1) // 2
-        else:
-            n = n // 2
+        n >>= 1
         x = (x * x) % m
     return d
 
