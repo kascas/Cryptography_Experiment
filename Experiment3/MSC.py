@@ -25,3 +25,4 @@ else:
     s = str(input("input list: "))
     c = str(input("input ciphertext: "))
     print("result is: " + de_MSC(s, c))
+os.system("pause")
