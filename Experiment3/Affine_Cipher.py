@@ -5,6 +5,7 @@ from GCD import GCD
 def Affine_Cipher(s, a, b, n):
     L = []
     for i in range(len(s)):
+        #turn characters into asc, then crypt
         L.append(chr(((ord(s[i]) - ord('a')) * a + b) % n + ord('a')))
     return "".join(L)
 
@@ -13,6 +14,7 @@ def de_Affine_Cipher(s, a, b, n):
     L = []
     m = GCD(a, n)[1]
     for i in range(len(s)):
+        #turn characters into asc, then decrypt
         L.append(chr(((ord(s[i]) - ord('a') - b) * m) % n + ord('a')))
     return "".join(L)
 
