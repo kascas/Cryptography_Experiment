@@ -14,30 +14,27 @@ def GF_minus(a, b, n=int("0b100011011", 2)):
 
 
 def GF_multi(a, b, n=int("0b100011011", 2)):
-    result, temp= 0, a
+    result = 0
     while (b != 0):
         if (b & 1) == 1:
-            result = result ^ temp
-        # temp = f(x) * (x ^ k)
-        temp = temp << 1
+            result = result ^ a
+        # a = f(x) * (x ^ k)
+        a = a << 1
+        # it's known that "x^n mod p(x)=p(x)-x^n"
         # if a7==1, then mod n to make deg(f(x)*(x^k))<8
-        if (temp >> 8) & 1 == 1:
-            temp = temp ^ n
-        #print(bin(temp).replace("0b","").zfill(8))
-        #do right-move to b
+        if (a >> 8) & 1 == 1:
+            a = a ^ n
+        # do right-move to b
         b = b >> 1
+        # print(bin(a).replace("0b","").zfill(8))
     return result
 
 
-def GF_mod(a, b):
-    temp, move = b, 0
-    while (temp < a):
-        temp = temp << 1
-        move += 1
+def GF_div(a, b):
     while (a > b):
-        a = a ^ (b << move)
-        move -= 1
-    return ()
+        temp = b
+        while (a > temp):
+            temp = temp << 1
 
 
 '''
