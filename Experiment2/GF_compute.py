@@ -31,10 +31,12 @@ def GF_multi(a, b, n=int("0b100011011", 2)):
 
 
 def GF_div(a, b):
+    quo, re = 0, 0
     while (a > b):
-        temp = b
-        while (a > temp):
-            temp = temp << 1
+        move = len(bin(a)) - len(bin(b))
+        a = a ^ (b << move)
+        quo += (1 << move)
+    return (quo, a)
 
 
 '''
@@ -48,6 +50,7 @@ b = trans(b_temp, type)
 print("GF_plus= " + bin(GF_plus(a, b)).replace("0b", ""))
 print("GF_minus= " + bin(GF_minus(a, b)).replace("0b", ""))
 print("GF_multi= " + bin(GF_multi(a, b)).replace("0b", ""))
-# print("GF_mod= " + bin(GF_mod(a, b)).replace("0b", ""))
+print("quo GF_div= " + bin(GF_div(a, b)[0]).replace("0b", ""))
+print("mod GF_div= " + bin(GF_div(a, b)[1]).replace("0b", ""))
 
 os.system("pause")
