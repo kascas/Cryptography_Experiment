@@ -9,7 +9,6 @@ def GF_PP(n=8):
     # 遍历
     for i in range((1 << n), max):
         judge = False
-        '''
         # 判断是否可约
         for j in range(2, (1 << n // 2 + 1)):
             if GF_div(i, j)[1] == 0:
@@ -17,7 +16,6 @@ def GF_PP(n=8):
                 break
         if judge:
             continue
-        '''
         # 如果不可约则判断整除
         m = 2 ** n - 1
         # 如果整除x^m+1
