@@ -32,7 +32,7 @@ def GF_multi(a, b, n=int("0b100011011", 2)):
 
 def GF_div(a, b):
     quo, re = 0, 0
-    while (a > b):
+    while (a >= b):
         move = len(bin(a)) - len(bin(b))
         a = a ^ (b << move)
         quo += (1 << move)
