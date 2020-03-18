@@ -15,6 +15,7 @@ def GF_GCD(a, b):
     else:
         g, x1, y1 = GF_GCD(b, GF_div(a, b)[1])
         x0, y0 = y1, GF_minus(x1, GF_multi(GF_div(a, b)[0], y1))
+        print(x0,y0)
         return (g, x0, y0)
 
 
