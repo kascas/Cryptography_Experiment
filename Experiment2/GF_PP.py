@@ -40,3 +40,4 @@ if __name__ == "__main__":
     L, count = GF_PP(n)
     print(L)
     print("result: {}".format(count))
+    os.system("pause")
