@@ -41,10 +41,10 @@ def cofactor_det(array, row, line):
 def matrix_I(array, n=26):
     num = len(array)
     array_I = numpy.zeros((num, num), dtype=numpy.int64)
-    array_det_I = GCD(int(numpy.linalg.det(array)), 26)[1]
+    array_det_I = GCD(int(round(numpy.linalg.det(array))), 26)[1]
     for i in range(num):
         for j in range(num):
-            array_I[i][j] = ((-1) ** (i + j)) * round(cofactor_det(array, i, j)) * array_det_I % 26
+            array_I[i][j] = ((-1) ** (i + j)) * int(round(cofactor_det(array, i, j))) * array_det_I % 26
     return array_I
 
 
