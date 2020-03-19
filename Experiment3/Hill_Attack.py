@@ -43,3 +43,4 @@ if __name__ == "__main__":
     m = input("input ciphertext: ")
     dim = int(input("input dimension: "))
     print(Hill_Attack(c, m, dim))
+    os.system("pause")
