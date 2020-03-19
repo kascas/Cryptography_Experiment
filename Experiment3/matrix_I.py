@@ -1,3 +1,6 @@
+import numpy
+from GCD import *
+
 def cofactor_det(array, row, line):
     num = len(array)
     result = numpy.zeros((num - 1, num - 1), dtype=numpy.int64)

@@ -1,7 +1,6 @@
 import os
 import numpy
-from martrix_I import *
-from GCD import GCD
+from matrix_I import *
 
 
 def Hill(c, key):
