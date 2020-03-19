@@ -1,6 +1,6 @@
 import os
 import numpy
-from matrix_I import *
+from Matrix_I import *
 from GCD import *
 
 

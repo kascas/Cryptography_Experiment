@@ -1,6 +1,6 @@
 import os
 import numpy
-from matrix_I import *
+from Matrix_I import *
 
 
 def Hill(c, key):
