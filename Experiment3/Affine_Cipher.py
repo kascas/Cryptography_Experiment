@@ -19,17 +19,18 @@ def de_Affine_Cipher(s, a, b, n):
     return "".join(L)
 
 
-judge = int(input("please choose [1]crypt, [2]decrypt:  "))
-if (judge == 1):
-    c = str(input("input c: "))
-    a = int(input("a= "))
-    b = int(input("b= "))
-    n = int(input("how many characters in this language: "))
-    print(Affine_Cipher(c, a, b, n))
-else:
-    c = str(input("input c: "))
-    a = int(input("a= "))
-    b = int(input("b= "))
-    n = int(input("how many characters in this language: "))
-    print(de_Affine_Cipher(c, a, b, n))
-os.system("pause")
+if __name__=="__name__":
+    judge = int(input("please choose [1]crypt, [2]decrypt:  "))
+    if (judge == 1):
+        c = str(input("input c: "))
+        a = int(input("a= "))
+        b = int(input("b= "))
+        n = int(input("how many characters in this language: "))
+        print(Affine_Cipher(c, a, b, n))
+    else:
+        c = str(input("input c: "))
+        a = int(input("a= "))
+        b = int(input("b= "))
+        n = int(input("how many characters in this language: "))
+        print(de_Affine_Cipher(c, a, b, n))
+    os.system("pause")

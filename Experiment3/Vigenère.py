@@ -11,6 +11,13 @@ def Vigenere(c, key):
 
 
 if __name__ == "__main__":
-    c = input("input plaintext: ")
-    key = input("input key: ")
-    print("result is: " + Vigenere(c, key))
+    judge = int(input("please choose [1]crypt, [2]decrypt:  "))
+    if (judge == 1):
+        c = input("input plaintext: ")
+        key = input("input key: ")
+        print("result is: " + Vigenere(c, key))
+    else:
+        c=input("input text: ")
+        key=input("input key: ")
+        print("result is: " + Vigenere(c, key))
+    os.system("pause")

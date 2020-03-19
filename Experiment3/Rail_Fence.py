@@ -19,15 +19,16 @@ def de_Rail_Fence(L, n):
     return "".join(L2)
 
 
-judge = int(input("please choose [1]crypt, [2]decrypt: "))
-if (judge == 1):
-    n = int(input("num of lines: "))
-    s = input("input text: ")
-    print(Rail_Fence(s, n))
-else:
-    L = []
-    n = int(input("num of lines: "))
-    for i in range(n):
-        L.append(input())
-    print(de_Rail_Fence(L, n))
-os.system("pause")
+if __name__ == "__name__":
+    judge = int(input("please choose [1]crypt, [2]decrypt: "))
+    if (judge == 1):
+        n = int(input("num of lines: "))
+        s = input("input text: ")
+        print(Rail_Fence(s, n))
+    else:
+        L = []
+        n = int(input("num of lines: "))
+        for i in range(n):
+            L.append(input())
+        print(de_Rail_Fence(L, n))
+    os.system("pause")

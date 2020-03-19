@@ -68,7 +68,13 @@ def de_Hill(c, key):
 
 
 if __name__ == "__main__":
-    c = input("input plaintext: ")
-    key = input("input key: ")
-    print("result is: " + Hill(c, key))
-    print("decrypt: " + de_Hill(Hill(c, key), key))
+    judge = int(input("please choose [1]crypt, [2]decrypt:  "))
+    if (judge == 1):
+        c = input("input plaintext: ")
+        key = input("input key: ")
+        print("result is: " + Hill(c, key))
+    else:
+        c = input("input text: ")
+        key = input("input key: ")
+        print("result: " + de_Hill(c, key))
+    os.system("pause")
