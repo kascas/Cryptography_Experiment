@@ -17,7 +17,7 @@ def de_MSC(s, c):
     return "".join(result)
 
 
-if __name__ == "__name__":
+if __name__ == "__main__":
     judge = int(input("please choose [1]crypt,[2]decrypt: "))
     if (judge == 1):
         s = str(input("input list: "))

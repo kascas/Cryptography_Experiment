@@ -4,6 +4,7 @@ import os
 def LFA(c):
     # single-letter mode
     dict = Single_Letter(c)
+    print("as for single-letter mode, result is: \n" + "".join(de_Trans(c, dict)))
     # double-letter mode
     result = Double_Letter(c, dict)
     if result != {}:
@@ -18,7 +19,7 @@ def LFA(c):
             key, value = readin.split(":")
         else:
             break
-        plaintext=[]
+        plaintext = []
         dict = ChangeDict(dict, key, value)
         for i in range(len(c)):
             if c[i] == ' ':
