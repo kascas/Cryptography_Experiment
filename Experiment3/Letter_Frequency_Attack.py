@@ -3,12 +3,7 @@ import os
 
 def LFA(c):
     # single-letter mode
-    dict = Single_Letter(c)
-    print("as for single-letter mode, result is: \n" + "".join(de_Trans(c, dict)))
-    # double-letter mode
-    result = Double_Letter(c, dict)
-    if result != {}:
-        dict = result
+    dict, statistics, frequency = Single_Letter(c)
     plaintext = de_Trans(c, dict)
     print(">>>ciphertext: " + c)
     print(">>>plaintext : " + "".join(plaintext))
@@ -63,46 +58,14 @@ def Single_Letter(c):
     for i in range(26):
         dict[statistics[i]] = frequency[i]
     # print("Single-letter: {}".format(dict))
-    return dict
-
-
-def Double_Letter(c, dict):
-    double_letter = ["is", "of", "in", "on", "it", "he", "me", "at", "by", "us", "to", "my", "if", "go", "by", "do",
-                     "no", "or", "so", "we"]
-    string, dict_list, phrase = c.split(" "), [], []
-    print("according to double-letter, choose from following sentences: ")
-    # select a double-letter-word
-    for i in range(len(string)):
-        if len(string[i]) == 2:
-            phrase.append(string[i])
-    if len(phrase) == 0:
-        print("no double-letter-word")
-        return {}
-    # recording the mapping for each situation
-    dict_k = dict.copy()
-    for k in range(len(phrase)):
-        for i in range(len(double_letter)):
-            dict_temp = dict_k.copy()
-            print("{:2}: ".format(i + 1), end="")
-            dict_temp = ChangeDict(dict_temp, phrase[k][0], double_letter[i][0])
-            dict_temp = ChangeDict(dict_temp, phrase[k][1], double_letter[i][1])
-            dict_list.append(dict_temp)
-            for j in range(len(c)):
-                if c[j] == ' ':
-                    print(" ", end="")
-                else:
-                    print(dict_temp[c[j]], end="")
-            print()
-        select = int(input("select one to continue: "))
-        dict_k, dict_list = dict_list[select - 1].copy(), []
-    return dict_k
+    return (dict, statistics, frequency)
 
 
 def de_Trans(c, dict):
     plaintext = []
     for i in range(len(c)):
-        if c[i] == ' ':
-            plaintext.append(' ')
+        if c[i].isalpha() == False:
+            plaintext.append(c[i])
         else:
             plaintext.append(dict[c[i]])
     return plaintext
