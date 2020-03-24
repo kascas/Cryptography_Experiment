@@ -19,7 +19,7 @@ def de_Affine_Cipher(s, a, b, n):
     return "".join(L)
 
 
-if __name__=="__name__":
+if __name__=="__main__":
     judge = int(input("please choose [1]crypt, [2]decrypt:  "))
     if (judge == 1):
         c = str(input("input c: "))
