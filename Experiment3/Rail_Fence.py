@@ -19,7 +19,7 @@ def de_Rail_Fence(L, n):
     return "".join(L2)
 
 
-if __name__ == "__name__":
+if __name__ == "__main__":
     judge = int(input("please choose [1]crypt, [2]decrypt: "))
     if (judge == 1):
         n = int(input("num of lines: "))
