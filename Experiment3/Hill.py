@@ -11,13 +11,14 @@ def Hill(c, key):
         L = key[i].split(",")
         for j in range(n):
             array[i][j] = L[j]
-    for i in range(0, len(c), n):
-        group = numpy.zeros((1, n), dtype=numpy.int64)
+    group = numpy.zeros((len(c)//n, n), dtype=numpy.int64)
+    for i in range(len(c)//n):
         for j in range(n):
-            group[0][j] = ord(c[i + j]) - ord("a")
-        multi = group.dot(array) % 26
+            group[i][j] = ord(c[i*n + j]) - ord("a")
+    multi = group.dot(array) % 26
+    for i in range(len(c)//n):
         for j in range(n):
-            result.append(chr(multi[0][j] + ord("a")))
+            result.append(chr(multi[i][j] + ord("a")))
     return "".join(result)
 
 
@@ -30,13 +31,14 @@ def de_Hill(c, key):
         for j in range(n):
             array[i][j] = L[j]
     array_I = matrix_I(array)
-    for i in range(0, len(c), n):
-        group = numpy.zeros((1, n), dtype=numpy.int64)
+    group = numpy.zeros((len(c)//n, n), dtype=numpy.int64)
+    for i in range(len(c)//n):
         for j in range(n):
-            group[0][j] = ord(c[i + j]) - ord("a")
-        multi = group.dot(array_I) % 26
+            group[i][j] = ord(c[i*n + j]) - ord("a")
+    multi = group.dot(array_I) % 26
+    for i in range(len(c)//n):
         for j in range(n):
-            result.append(chr(multi[0][j] + ord("a")))
+            result.append(chr(multi[i][j] + ord("a")))
     return "".join(result)
 
 
