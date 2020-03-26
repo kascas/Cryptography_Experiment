@@ -14,7 +14,7 @@ def Vernam(f_in, f_out, key):
     return
 
 
-if __name__ == "__name__":
+if __name__ == "__main__":
     f_in_path = input("input path for input: ")
     f_out_path = input("input path for output: ")
     f_in, f_out = open(f_in_path, mode="r"), open(f_out_path, mode="w")
