@@ -9,8 +9,10 @@ def Rail_Fence(s, n):
     return "".join(L)
 
 
-def de_Rail_Fence(L, n):
-    L2 = []
+def de_Rail_Fence(s, n):
+    L2, L, length = [], [], len(s) // n
+    for i in range(n):
+        L.append(s[length * i:length * (i + 1)])
     for i in range(len(L[0])):
         for j in range(n):
             if (i > len(L[j]) - 1):
@@ -26,9 +28,7 @@ if __name__ == "__main__":
         s = input("input text: ")
         print(Rail_Fence(s, n))
     else:
-        L = []
         n = int(input("num of lines: "))
-        for i in range(n):
-            L.append(input())
-        print(de_Rail_Fence(L, n))
+        s = input("input text: ")
+        print(de_Rail_Fence(s, n))
     os.system("pause")
