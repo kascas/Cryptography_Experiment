@@ -17,6 +17,7 @@ def One_mark(n):
 def Hill_Attack(c, m, dim):
     c_array_temp = numpy.zeros((len(c) // dim, dim), dtype=numpy.int64)
     m_array_temp = numpy.zeros((len(c) // dim, dim), dtype=numpy.int64)
+    # 构建明密文矩阵
     for i in range(len(c) // dim):
         for j in range(dim):
             c_array_temp[i][j], m_array_temp[i][j] = ord(c[dim * i + j]) - ord("a"), ord(m[dim * i + j]) - ord("a")
@@ -24,11 +25,14 @@ def Hill_Attack(c, m, dim):
     m_array = numpy.zeros((dim, dim), dtype=numpy.int64)
     c_array[:, :], m_array[:, :] = c_array_temp[0:dim, :], m_array_temp[0:dim, :]
     max, current = 1 << (len(c) // dim), 2
+    # One_mark 用于遍历整个m×n矩阵中的n×n矩阵
     while GCD(int(round(numpy.linalg.det(c_array))), 26)[0] != 1:
         while (One_mark(current)[0] != dim):
             current += 1
+        # 如果m×n范围内没有合适的，返回“不能破译”
         if (current >= max):
             return "Error, cannot decrypt"
+        # 标注1则表示该行被选中
         L = One_mark(current)[1]
         for i in range(dim):
             c_array[i, :] = c_array_temp[L[i], :]
