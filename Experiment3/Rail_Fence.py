@@ -10,9 +10,14 @@ def Rail_Fence(s, n):
 
 
 def de_Rail_Fence(s, n):
-    L2, L, length = [], [], len(s) // n
+    L2, L, length, judge = [], [], len(s) // n, len(s) % n
+    if judge != 0:
+        length += 1
     for i in range(n):
-        L.append(s[length * i:length * (i + 1)])
+        if length * (i + 1) < len(s):
+            L.append(s[length * i:length * (i + 1)])
+        else:
+            L.append(s[length * i:len(s)])
     for i in range(len(L[0])):
         for j in range(n):
             if (i > len(L[j]) - 1):
