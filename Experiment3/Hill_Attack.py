@@ -24,7 +24,7 @@ def Hill_Attack(c, m, dim):
     m_array = numpy.zeros((dim, dim), dtype=numpy.int64)
     c_array[:, :], m_array[:, :] = c_array_temp[0:dim, :], m_array_temp[0:dim, :]
     max, current = 1 << (len(c) // dim), 2
-    while GCD(int(round(numpy.linalg.det(c_array))), 26)[0] != 1 and current < max:
+    while GCD(int(round(numpy.linalg.det(c_array))), 26)[0] != 1:
         while (One_mark(current)[0] != dim):
             current += 1
         if (current >= max):
