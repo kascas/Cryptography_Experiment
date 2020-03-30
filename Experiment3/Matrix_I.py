@@ -1,6 +1,7 @@
 import numpy
 from GCD import *
 
+
 def cofactor_det(array, row, line):
     num = len(array)
     result = numpy.zeros((num - 1, num - 1), dtype=numpy.int64)
@@ -21,7 +22,9 @@ def cofactor_det(array, row, line):
 def matrix_I(array, n=26):
     num = len(array)
     array_I = numpy.zeros((num, num), dtype=numpy.int64)
-    array_det_I = GCD(int(round(numpy.linalg.det(array),0)), 26)[1]
+    array_det_I = GCD(int(round(numpy.linalg.det(array), 0)), 26)[1]
+    if GCD(int(round(numpy.linalg.det(array), 0)), 26)[0] != 1:
+        return "Error"
     for i in range(num):
         for j in range(num):
             array_I[i][j] = ((-1) ** (i + j)) * int(round(cofactor_det(array, i, j))) * array_det_I % 26

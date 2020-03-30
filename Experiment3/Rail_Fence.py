@@ -10,20 +10,24 @@ def Rail_Fence(s, n):
 
 
 def de_Rail_Fence(s, n):
-    L2, L, length, judge = [], [], len(s) // n, len(s) % n
-    if judge != 0:
-        length += 1
+    L, count, pos, result = [], [len(s) // n] * n, 0, []
+    for i in range(len(s) % n):
+        count[i] += 1
     for i in range(n):
-        if length * (i + 1) < len(s):
-            L.append(s[length * i:length * (i + 1)])
-        else:
-            L.append(s[length * i:len(s)])
-    for i in range(len(L[0])):
+        L.append(s[pos:pos + count[i]])
+        pos += count[i]
+    print(L)
+    if len(s) % n != 0:
+        length = len(s) // n + 1
+    else:
+        length = len(s) // n
+    for i in range(length):
         for j in range(n):
-            if (i > len(L[j]) - 1):
+            if i <= count[j] - 1:
+                result.append(L[j][i])
+            else:
                 continue
-            L2.append(L[j][i])
-    return "".join(L2)
+    return "".join(result)
 
 
 if __name__ == "__main__":
