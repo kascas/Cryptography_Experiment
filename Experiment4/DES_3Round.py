@@ -158,5 +158,6 @@ if __name__ == "__main__":
     mode = int(input("mode: [1]crypt [2]decrypt "))
     p = int(input("input text: "), 16)
     key = int(input("input key: "), 16)
-    print("\nciphertext is: " + DES_3Round(p, key, mode))
+    key_list=Key_Creater(key)
+    print("\nciphertext is: " + hex(DES_3Round(p, key_list)))
     os.system("pause")
