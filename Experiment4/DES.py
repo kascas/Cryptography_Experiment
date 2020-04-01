@@ -145,9 +145,7 @@ def Key_Creater(key, mode):
     C, D = key_in >> 28, key_in & (int("0xfffffff", 16))
     for i in range(16):
         # left move
-        for j in range(KEY_MOVE[i]):
-            C = ((C << 1) & int("0xfffffff", 16)) + (C >> 27)
-            D = ((D << 1) & int("0xfffffff", 16)) + (D >> 27)
+        C, D = KeyMove(C, D, i)
         key, key_out = (C << 28) + D, 0
         # key_trans_2
         key_out = PC_2(key)
@@ -226,6 +224,13 @@ def PC_2(key):
         if key & (1 << (56 - KEY_TRANS_2[k])) != 0:
             key_out += 1
     return key_out
+
+
+def KeyMove(C, D, i):
+    for j in range(KEY_MOVE[i]):
+        C = ((C << 1) & int("0xfffffff", 16)) + (C >> 27)
+        D = ((D << 1) & int("0xfffffff", 16)) + (D >> 27)
+    return C, D
 
 
 def Function(R, key):
