@@ -124,29 +124,23 @@ def DES(p, key, mode):
     print("L0: " + hex(L))
     print("R0: " + hex(R))
     # create key_list
-    if mode == 1:
-        key_list = Key_Creater(key)
-    else:
-        key_list = Key_Creater(key)
-        key_list.reverse()
+    key_list = Key_Creater(key, mode)[:]
     # feistel strcture
     for i in range(16):
         L, R = R, Function(R, key_list[i]) ^ L
-        print(
-            "Round {}: L={}, R={}".format(i + 1, hex(L).replace("0x", "").zfill(8), hex(R).replace("0x", "").zfill(8)))
+        print("Round {}: L={}, R={}".format(
+            i + 1,
+            hex(L).replace("0x", "").zfill(8),
+            hex(R).replace("0x", "").zfill(8)))
     p = (R << 32) + L
     p_IP_I = IP_I_Trans(p)
     print("IP_I(p): ", hex(p_IP_I).zfill(16))
     return hex(p_IP_I).replace("0x", "").zfill(16)
 
 
-def Key_Creater(key):
+def Key_Creater(key, mode):
     key_list, key_in = [], 0
-    # key_trans_1
-    for i in range(56):
-        key_in <<= 1
-        if key & (1 << (64 - KEY_TRANS_1[i])) != 0:
-            key_in += 1
+    key_in = PC_1(key)
     # divide key_in into C and D
     C, D = key_in >> 28, key_in & (int("0xfffffff", 16))
     for i in range(16):
@@ -156,11 +150,10 @@ def Key_Creater(key):
             D = ((D << 1) & int("0xfffffff", 16)) + (D >> 27)
         key, key_out = (C << 28) + D, 0
         # key_trans_2
-        for k in range(48):
-            key_out <<= 1
-            if key & (1 << (56 - KEY_TRANS_2[k])) != 0:
-                key_out += 1
+        key_out = PC_2(key)
         key_list.append(key_out)
+    if mode == 2:
+        key_list.reverse()
     return key_list
 
 
@@ -202,12 +195,8 @@ def P_Trans(s_out):
     return R_P
 
 
-def Function(R, key):
-    R_E, R_P = 0, 0
-    # e_trans
-    R_E = E_Trans(R)
-    # s_in is a 48-bit input, extract is used to divide s_in into 8 4-bit pieces
-    s_in, extract, s_out = R_E ^ key, int("0b111111", 2), 0
+def S_box(s_in):
+    extract, s_out = int("0b111111", 2), 0
     # s_box
     for i in range(8):
         s_out <<= 4
@@ -217,6 +206,36 @@ def Function(R, key):
         select = ((s >> 5) << 1) + (s & 1)
         index = (s & int("0b011110", 2)) >> 1
         s_out += S_BOX[i][select][index]
+    return s_out
+
+
+def PC_1(key):
+    key_in = 0
+    # key_trans_1
+    for i in range(56):
+        key_in <<= 1
+        if key & (1 << (64 - KEY_TRANS_1[i])) != 0:
+            key_in += 1
+    return key_in
+
+
+def PC_2(key):
+    key_out = 0
+    for k in range(48):
+        key_out <<= 1
+        if key & (1 << (56 - KEY_TRANS_2[k])) != 0:
+            key_out += 1
+    return key_out
+
+
+def Function(R, key):
+    R_E, R_P = 0, 0
+    # e_trans
+    R_E = E_Trans(R)
+    # s_in is a 48-bit input, extract is used to divide s_in into 8 4-bit pieces
+    s_in, extract, s_out = R_E ^ key, int("0b111111", 2), 0
+    # s_box
+    s_out = S_box(s_in)
     # p_trans
     R_P = P_Trans(s_out)
     return R_P
