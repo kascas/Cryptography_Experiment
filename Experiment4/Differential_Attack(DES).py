@@ -379,3 +379,4 @@ if __name__ == "__main__":
         print("J{}= {}".format(i, bin(key_list[i]).replace("0b", "").zfill(6)))
     print("64 bit: ",end="")
     print(hex(KeyRestore(key, p, c)).replace("0x", "").zfill(16))
+    os.system("pause")
