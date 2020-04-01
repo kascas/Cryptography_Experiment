@@ -117,10 +117,7 @@ KEY_TRANS_2 = [
 def DES(p, key, mode):
     p_IP, p_IP_I = 0, 0
     # e_trans
-    for i in range(64):
-        p_IP <<= 1
-        if p & (1 << (64 - IP[i])) != 0:
-            p_IP += 1
+    p_IP = IP_Trans(p)
     print("IP(p): " + hex(p_IP))
     # divide p into L and R
     L, R = p_IP >> 32, p_IP & (int("0xffffffff", 16))
@@ -138,10 +135,7 @@ def DES(p, key, mode):
         print(
             "Round {}: L={}, R={}".format(i + 1, hex(L).replace("0x", "").zfill(8), hex(R).replace("0x", "").zfill(8)))
     p = (R << 32) + L
-    for i in range(64):
-        p_IP_I <<= 1
-        if p & (1 << (64 - IP_I[i])) != 0:
-            p_IP_I += 1
+    p_IP_I = IP_I_Trans(p)
     print("IP_I(p): ", hex(p_IP_I).zfill(16))
     return hex(p_IP_I).replace("0x", "").zfill(16)
 
@@ -170,13 +164,48 @@ def Key_Creater(key):
     return key_list
 
 
-def Function(R, key):
-    R_E, R_P = 0, 0
+def IP_Trans(p):
+    p_IP = 0
+    # e_trans
+    for i in range(64):
+        p_IP <<= 1
+        if p & (1 << (64 - IP[i])) != 0:
+            p_IP += 1
+    return p_IP
+
+
+def IP_I_Trans(p):
+    p_IP_I = 0
+    for i in range(64):
+        p_IP_I <<= 1
+        if p & (1 << (64 - IP_I[i])) != 0:
+            p_IP_I += 1
+    return p_IP_I
+
+
+def E_Trans(R):
+    R_E = 0
     # e_trans
     for i in range(48):
         R_E <<= 1
         if R & (1 << (32 - E_TRANS[i])) != 0:
             R_E += 1
+    return R_E
+
+
+def P_Trans(s_out):
+    R_P = 0
+    for i in range(32):
+        R_P <<= 1
+        if s_out & (1 << (32 - P_TRANS[i])) != 0:
+            R_P += 1
+    return R_P
+
+
+def Function(R, key):
+    R_E, R_P = 0, 0
+    # e_trans
+    R_E = E_Trans(R)
     # s_in is a 48-bit input, extract is used to divide s_in into 8 4-bit pieces
     s_in, extract, s_out = R_E ^ key, int("0b111111", 2), 0
     # s_box
@@ -189,10 +218,7 @@ def Function(R, key):
         index = (s & int("0b011110", 2)) >> 1
         s_out += S_BOX[i][select][index]
     # p_trans
-    for i in range(32):
-        R_P <<= 1
-        if s_out & (1 << (32 - P_TRANS[i])) != 0:
-            R_P += 1
+    R_P = P_Trans(s_out)
     return R_P
 
 
