@@ -25,11 +25,11 @@ def SDES(p, key, mode):
     p_IP, p_IP_I = 0, 0
     # e_trans
     p_IP = IP_Trans(p)
-    print("IP(p): " + hex(p_IP))
+    # print("IP(p): " + hex(p_IP))
     # divide p into L and R
     L, R = p_IP >> 4, p_IP & (int("0xf", 16))
-    print("L0: " + hex(L))
-    print("R0: " + hex(R))
+    # print("L0: " + hex(L))
+    # print("R0: " + hex(R))
     # create key_list
     key_list = KeyCreater(key, mode)
     # feistel strcture
@@ -37,8 +37,8 @@ def SDES(p, key, mode):
         L, R = R, Function(R, key_list[i]) ^ L
     p = (R << 4) + L
     p_IP_I = IP_I_Trans(p)
-    print("IP_I(p): ", hex(p_IP_I).zfill(2))
-    return hex(p_IP_I).replace("0x", "").zfill(2)
+    # print("IP_I(p): ", hex(p_IP_I).zfill(2))
+    return p_IP_I
 
 
 def Function(R, key):
@@ -137,9 +137,9 @@ def P_Trans(s_out):
     return R_P
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     mode = int(input("mode: [1]crypt [2]decrypt "))
     p = int(input("input text: "), 16)
     key = int(input("input key: "), 16)
-    print("\nciphertext is: " + SDES(p, key, mode))
+    print("\nciphertext is: {}".format(hex(SDES(p, key, mode))))
     os.system("pause")
