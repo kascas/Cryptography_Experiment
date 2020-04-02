@@ -44,7 +44,7 @@ def SDES(p, key, mode):
 def Function(R, key):
     R_E, R_P = 0, 0
     # e_trans
-    R_E = E_Trans(R)
+    R_E = E_Trans(R) ^ key
     # s_in is a 48-bit input, extract is used to divide s_in into 8 4-bit pieces
     # s_box
     s0, s1 = R_E >> 4, R_E & int("0xf", 16)
