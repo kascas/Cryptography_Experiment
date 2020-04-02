@@ -95,8 +95,6 @@ KEY_TRANS_2 = [
 def DES_3Round(p, key_list):
     # divide p into L and R
     L, R = p >> 32, p & (int("0xffffffff", 16))
-    # create key_list
-    # key_list = Key_Creater(key)
     # feistel strcture
     for i in range(3):
         L, R = R, Function(R, key_list[i]) ^ L
