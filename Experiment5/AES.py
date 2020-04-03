@@ -4,6 +4,12 @@ from GF_GCD import *
 
 
 def ByteTransfer(p, total):
+    '''
+    this function is used to divide 'int' into bytes
+    :param p:
+    :param total:
+    :return: byte-list
+    '''
     # length is the length of p(bits), total is the number of bytes
     List = []
     for i in range(total):
@@ -31,7 +37,12 @@ def GF_MatrixPlus(a, b):
 
 
 def S_BoxCreater():
+    '''
+    this function is used to create s-box
+    :return: s-box
+    '''
     array = [[0 for i in range(16)] for j in range(16)]
+    # use GCD to compute inverse
     for x in range(16):
         for y in range(16):
             if x == 0 and y == 0:
@@ -51,6 +62,7 @@ def S_BoxCreater():
     c = [
         [1], [1], [0], [0], [0], [1], [1], [0]
     ]
+    # use matrix-plus and matrix-multi to compute
     for i in range(16):
         for j in range(16):
             s, s_array = array[i][j], [[0 for i in range(1)] for j in range(8)]
@@ -61,14 +73,6 @@ def S_BoxCreater():
                 result <<= 1
                 result = result + temp[7 - k][0]
             array[i][j] = result
-    # test module
-    '''
-    for i in range(16):
-        for j in range(16):
-            print(hex(array[i][j]).replace("0x", "").zfill(2) + " ", end="")
-            if j == 15:
-                print()
-    '''
     return array
 
 
@@ -76,6 +80,11 @@ S_BOX = S_BoxCreater()
 
 
 def NrComputer(Nk):
+    '''
+    this function is used to compute Nr according to Nk
+    :param Nk:
+    :return: Nr
+    '''
     if Nk == 4:
         return 10
     if Nk == 6:
@@ -85,9 +94,15 @@ def NrComputer(Nk):
 
 
 def ShiftRows(state):
+    '''
+    this function is used to ShiftRows
+    :param state:
+    :return: ...
+    '''
     Nb, move = len(state[0]), [0, 1, 2, 3]
     result = [[0 for i in range(Nb)] for j in range(4)]
     for i in range(4):
+        # temp is the value of the s[i]s[i+4]s[i+8]s[i+12]
         temp = 0
         for j in range(Nb):
             temp <<= 8
@@ -101,6 +116,11 @@ def ShiftRows(state):
 
 
 def MixColumns(state):
+    '''
+    this function is used to MixColumns
+    :param state:
+    :return: ...
+    '''
     matrix = [
         [2, 3, 1, 1],
         [1, 2, 3, 1],
@@ -112,8 +132,12 @@ def MixColumns(state):
 
 
 def AddRoundKey(state, Roundkey):
-    # print("state: {}".format(state))
-    # print("RoundKey: {}".format(Roundkey))
+    '''
+    add RoundKey
+    :param state:
+    :param Roundkey:
+    :return: ...
+    '''
     for i in range(4):
         for j in range(len(state[0])):
             state[i][j] ^= Roundkey[i][j]
@@ -121,6 +145,11 @@ def AddRoundKey(state, Roundkey):
 
 
 def SubBytes(state):
+    '''
+    this function is used to SubBytes
+    :param state:
+    :return: ...
+    '''
     for i in range(len(state)):
         for j in range(len(state[0])):
             x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
@@ -129,11 +158,18 @@ def SubBytes(state):
 
 
 def Key_Sub(w):
+    '''
+    this function is used to do SubByte to w
+    :param w:
+    :return: value after sub
+    '''
+    # left move
     w, w_byte = ((w << 8) & int("0xffffffff", 16)) + (w >> 24), []
-    # print("RotWord: {}".format(hex(w)))
+    # divide w into 4 bytes
     for i in range(4):
         w_byte.append((w >> ((3 - i) * 8)) & int("0xff", 16))
     w_sub = 0
+    # do SubBytes to every w-byte
     for i in range(4):
         x, y = w_byte[i] >> 4, w_byte[i] & int("0xf", 16)
         w_byte[i] = S_BOX[x][y]
@@ -143,26 +179,33 @@ def Key_Sub(w):
 
 
 def KeyExpansion(key, Nk, Nr):
+    '''
+    this function is used for KeyExpansion
+    :param key:
+    :param Nk:
+    :param Nr:
+    :return: a list for key
+    '''
     key_word_list = [0 for i in range(Nk)]
+    # divide key into words
     for i in range(Nk):
         key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
-    matrix = [[0 for i in range(4)] for j in range(4)]
     word_num = 4 * (NrComputer(Nk) + 1)
     w = [0 for i in range(word_num)]
     w[0], w[1], w[2], w[3] = \
         key_word_list[0], key_word_list[1], key_word_list[2], key_word_list[3]
     Rcon = [0 for i in range(14)]
     Rcon[0] = 1
+    # compute Rcon
     for i in range(1, 14):
         Rcon[i] = GF_multi(Rcon[i - 1], 2)
+    # compute w[i]
     for i in range(4, word_num):
         temp = w[i - 1]
         if i % 4 == 0:
             temp = Key_Sub(w[i - 1]) ^ (Rcon[i // 4 - 1] << 24)
-            # print("Rcon: {}".format(hex(Rcon[i // 4 - 1] << 24)))
-            # print("Subword: {}".format(hex(Key_Sub(w[i - 1]))))
         w[i] = temp ^ w[i - 4]
-        # print("w{}: {}".format(i, hex(w[i]).replace("0x", "").zfill(8)))
+    # put w into byte-matrix
     key_array = [[[0 for k in range(4)] for i in range(4)] for j in range(Nr + 1)]
     for i in range(Nr + 1):
         temp = []
@@ -171,22 +214,28 @@ def KeyExpansion(key, Nk, Nr):
         for j in range(4):
             for k in range(4):
                 key_array[i][j][k] = temp[k][j]
-
-    for i in range(Nr + 1):
-        print("w{}: ".format(i))
-        for j in range(4):
-            for k in range(4):
-                print(hex(key_array[i][j][k]).replace("0x", ""), end=" ")
-            print()
-
     return key_array
 
 
 def Text_into_Matrix(s):
+    '''
+    transfer text into byte-matrix
+    :param s:
+    :return: a matrix
+    '''
     temp, matrix = ByteTransfer(s, 16), [[] for i in range(4)]
     for i in range(16):
         matrix[i % 4].append(temp[i])
     return matrix
+
+
+def Matrix_into_Text(state):
+    result = 0
+    for i in range(4):
+        for j in range(4):
+            result <<= 8
+            result += state[j][i]
+    return result
 
 
 def AES(s, key, mode, Nk):
@@ -202,11 +251,7 @@ def AES(s, key, mode, Nk):
     state = SubBytes(state)
     state = ShiftRows(state)
     state = AddRoundKey(state, key_list[Nr])
-    result = 0
-    for i in range(4):
-        for j in range(4):
-            result <<= 8
-            result += state[j][i]
+    result = Matrix_into_Text(state)
     return result
 
 
@@ -214,4 +259,4 @@ if __name__ == "__main__":
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
     Nk = int(input("keylen= ")) // 32
-    print(hex(AES(p, k, 1, Nk)))
+    print("\n>>>result: " + hex(AES(p, k, 1, Nk)))
