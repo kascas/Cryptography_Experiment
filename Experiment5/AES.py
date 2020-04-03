@@ -100,7 +100,6 @@ def ShiftRows(state):
     :return: ...
     '''
     Nb, move = len(state[0]), [0, 1, 2, 3]
-    result = [[0 for i in range(Nb)] for j in range(4)]
     for i in range(4):
         # temp is the value of the s[i]s[i+4]s[i+8]s[i+12]
         temp = 0
@@ -192,8 +191,8 @@ def KeyExpansion(key, Nk, Nr):
         key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
     word_num = 4 * (NrComputer(Nk) + 1)
     w = [0 for i in range(word_num)]
-    w[0], w[1], w[2], w[3] = \
-        key_word_list[0], key_word_list[1], key_word_list[2], key_word_list[3]
+    for i in range(Nk):
+        w[i] = key_word_list[i]
     Rcon = [0 for i in range(14)]
     Rcon[0] = 1
     # compute Rcon
@@ -202,9 +201,11 @@ def KeyExpansion(key, Nk, Nr):
     # compute w[i]
     for i in range(4, word_num):
         temp = w[i - 1]
-        if i % 4 == 0:
-            temp = Key_Sub(w[i - 1]) ^ (Rcon[i // 4 - 1] << 24)
-        w[i] = temp ^ w[i - 4]
+        if i % Nk == 0:
+            temp = Key_Sub(temp) ^ (Rcon[i // Nk - 1] << 24)
+        elif (Nk > 6) and (i % Nk == 4):
+            temp = Key_Sub(temp)
+        w[i] = temp ^ w[i - Nk]
     # put w into byte-matrix
     key_array = [[[0 for k in range(4)] for i in range(4)] for j in range(Nr + 1)]
     for i in range(Nr + 1):
