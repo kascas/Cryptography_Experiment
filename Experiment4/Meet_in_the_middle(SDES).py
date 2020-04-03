@@ -46,3 +46,4 @@ if __name__ == "__main__":
     print(">>>key2: " + hex(List[0][1]))
     # print("key1: " + hex(KeyTest(p, c, List)[0]))
     # print("key2: " + hex(KeyTest(p, c, List)[1]))
+    os.system("pause")
