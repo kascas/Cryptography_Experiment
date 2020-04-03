@@ -1,5 +1,4 @@
 import os
-import numpy as np
 from GF_compute import *
 from GF_GCD import *
 
@@ -13,7 +12,7 @@ def ByteTransfer(p, total):
 
 
 def GF_MatrixMulti(a, b):
-    result = np.zeros((len(a), len(b[0])), dtype=np.int64)
+    result = [[0 for i in range(len(b[0]))] for j in range(len(a))]
     for i in range(len(a)):
         for j in range(len(b[0])):
             temp = 0
@@ -24,7 +23,7 @@ def GF_MatrixMulti(a, b):
 
 
 def GF_MatrixPlus(a, b):
-    result = np.zeros((len(a), len(a[0])), dtype=np.int64)
+    result = [[0 for i in range(len(a[0]))] for j in range(len(a))]
     for i in range(len(a)):
         for j in range(len(a[0])):
             result[i][j] = GF_plus(a[i][j], b[i][j])
@@ -32,14 +31,14 @@ def GF_MatrixPlus(a, b):
 
 
 def S_BoxCreater():
-    array = np.zeros((16, 16), dtype=np.int64)
+    array = [[0 for i in range(16)] for j in range(16)]
     for x in range(16):
         for y in range(16):
             if x == 0 and y == 0:
                 array[x][y] = 0
             else:
                 array[x][y] = GF_GCD((x << 4) + y, int("11b", 16))[1]
-    matrix = np.array([
+    matrix = [
         [1, 0, 0, 0, 1, 1, 1, 1],
         [1, 1, 0, 0, 0, 1, 1, 1],
         [1, 1, 1, 0, 0, 0, 1, 1],
@@ -48,19 +47,19 @@ def S_BoxCreater():
         [0, 1, 1, 1, 1, 1, 0, 0],
         [0, 0, 1, 1, 1, 1, 1, 0],
         [0, 0, 0, 1, 1, 1, 1, 1]
-    ])
-    c = np.array([
+    ]
+    c = [
         [1], [1], [0], [0], [0], [1], [1], [0]
-    ])
+    ]
     for i in range(16):
         for j in range(16):
-            s, s_array = array[i][j], np.zeros((8, 1), dtype=np.int64)
+            s, s_array = array[i][j], [[0 for i in range(1)] for j in range(8)]
             for k in range(8):
                 s_array[k][0] = (s >> k) & 1
             temp, result = GF_MatrixPlus(GF_MatrixMulti(matrix, s_array), c), 0
             for k in range(8):
                 result <<= 1
-                result = result + temp[7 - k]
+                result = result + temp[7 - k][0]
             array[i][j] = result
     # test module
     '''
@@ -76,18 +75,12 @@ def S_BoxCreater():
 S_BOX = S_BoxCreater()
 
 
-def NrComputer(Nb, Nk):
-    if Nb == 4 and Nk == 4:
+def NrComputer(Nk):
+    if Nk == 4:
         return 10
-    if (Nb == 6 and Nk == 4) \
-            or (Nb == 6 and Nk == 6) \
-            or (Nb == 4 and Nk == 6):
+    if Nk == 6:
         return 12
-    if (Nb == 8 and Nk == 4) \
-            or (Nb == 8 and Nk == 6) \
-            or (Nb == 8 and Nk == 8) \
-            or (Nb == 6 and Nk == 8) \
-            or (Nb == 4 and Nk == 8):
+    if Nk == 8:
         return 14
 
 
@@ -108,17 +101,19 @@ def ShiftRows(state):
 
 
 def MixColumns(state):
-    matrix = np.array([
+    matrix = [
         [2, 3, 1, 1],
         [1, 2, 3, 1],
         [1, 1, 2, 3],
         [3, 1, 1, 2]
-    ])
+    ]
     result = GF_MatrixMulti(matrix, state)
     return result
 
 
 def AddRoundKey(state, Roundkey):
+    # print("state: {}".format(state))
+    # print("RoundKey: {}".format(Roundkey))
     for i in range(4):
         for j in range(len(state[0])):
             state[i][j] ^= Roundkey[i][j]
@@ -132,39 +127,91 @@ def SubBytes(state):
             state[i][j] = S_BOX[x][y]
     return state
 
-def
 
-def AES(state, key, mode, Nb, Nk):
-    key_list = KeyExpansion(key)
+def Key_Sub(w):
+    w, w_byte = ((w << 8) & int("0xffffffff", 16)) + (w >> 24), []
+    # print("RotWord: {}".format(hex(w)))
+    for i in range(4):
+        w_byte.append((w >> ((3 - i) * 8)) & int("0xff", 16))
+    w_sub = 0
+    for i in range(4):
+        x, y = w_byte[i] >> 4, w_byte[i] & int("0xf", 16)
+        w_byte[i] = S_BOX[x][y]
+        w_sub <<= 8
+        w_sub += w_byte[i]
+    return w_sub
+
+
+def KeyExpansion(key, Nk, Nr):
+    key_word_list = [0 for i in range(Nk)]
+    for i in range(Nk):
+        key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
+    matrix = [[0 for i in range(4)] for j in range(4)]
+    word_num = 4 * (NrComputer(Nk) + 1)
+    w = [0 for i in range(word_num)]
+    w[0], w[1], w[2], w[3] = \
+        key_word_list[0], key_word_list[1], key_word_list[2], key_word_list[3]
+    Rcon = [0 for i in range(14)]
+    Rcon[0] = 1
+    for i in range(1, 14):
+        Rcon[i] = GF_multi(Rcon[i - 1], 2)
+    for i in range(4, word_num):
+        temp = w[i - 1]
+        if i % 4 == 0:
+            temp = Key_Sub(w[i - 1]) ^ (Rcon[i // 4 - 1] << 24)
+            # print("Rcon: {}".format(hex(Rcon[i // 4 - 1] << 24)))
+            # print("Subword: {}".format(hex(Key_Sub(w[i - 1]))))
+        w[i] = temp ^ w[i - 4]
+        # print("w{}: {}".format(i, hex(w[i]).replace("0x", "").zfill(8)))
+    key_array = [[[0 for k in range(4)] for i in range(4)] for j in range(Nr + 1)]
+    for i in range(Nr + 1):
+        temp = []
+        for j in range(4):
+            temp.append(ByteTransfer(w[i * 4 + j], 4))
+        for j in range(4):
+            for k in range(4):
+                key_array[i][j][k] = temp[k][j]
+
+    for i in range(Nr + 1):
+        print("w{}: ".format(i))
+        for j in range(4):
+            for k in range(4):
+                print(hex(key_array[i][j][k]).replace("0x", ""), end=" ")
+            print()
+
+    return key_array
+
+
+def Text_into_Matrix(s):
+    temp, matrix = ByteTransfer(s, 16), [[] for i in range(4)]
+    for i in range(16):
+        matrix[i % 4].append(temp[i])
+    return matrix
+
+
+def AES(s, key, mode, Nk):
+    Nr = NrComputer(Nk)
+    state = Text_into_Matrix(s)
+    key_list = KeyExpansion(key, Nk, Nr)
     state = AddRoundKey(state, key_list[0])
-    Nr = NrComputer(Nb, Nk)
-    for i in range(Nr - 1):
+    for i in range(1, Nr):
         state = SubBytes(state)
         state = ShiftRows(state)
         state = MixColumns(state)
-        AddRoundKey(state, key_list[i + 1])
+        state = AddRoundKey(state, key_list[i])
     state = SubBytes(state)
     state = ShiftRows(state)
     state = AddRoundKey(state, key_list[Nr])
-    return state
+    result = 0
+    for i in range(4):
+        for j in range(4):
+            result <<= 8
+            result += state[j][i]
+    return result
 
 
 if __name__ == "__main__":
-    List = ByteTransfer(int("2b24424b9fed5966", 16), 8)
-    for i in range(8):
-        print(hex(List[i]))
-    print(S_BOX)
-    a = [
-        [7, 4, 1, 2],
-        [5, 3, 2, 7],
-        [8, 4, 2, 1],
-        [5, 4, 2, 1]
-    ]
-    b = [
-        [int("87", 16), int("f2", 16), int("4d", 16), int("97", 16)],
-        [int("6e", 16), int("4c", 16), int("90", 16), int("ec", 16)],
-        [int("46", 16), int("e7", 16), int("4a", 16), int("c3", 16)],
-        [int("a6", 16), int("8c", 16), int("d8", 16), int("95", 16)],
-    ]
-    print(ShiftRows(a))
-    print(MixColumns(b))
+    p = int(input("text= "), 16)
+    k = int(input("key= "), 16)
+    Nk = int(input("keylen= ")) // 32
+    print(hex(AES(p, k, 1, Nk)))
