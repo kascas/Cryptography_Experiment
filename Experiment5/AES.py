@@ -14,6 +14,7 @@ def ByteTransfer(p, total):
 
 S_BOX = SboxCreater()
 S_BOX_I = Sbox_I_Creater()
+Nb = 4
 
 
 def GF_MatrixMulti(a, b):
@@ -55,7 +56,7 @@ def ShiftRows(state, mode):
     :param state:
     :return: ...
     '''
-    Nb, move = len(state[0]), [0, 1, 2, 3]
+    move = [0, 1, 2, 3]
     for i in range(4):
         # temp is the value of the s[i]s[i+4]s[i+8]s[i+12]
         temp = 0
@@ -108,7 +109,7 @@ def AddRoundKey(state, Roundkey, mode):
     if mode == 2:
         Roundkey = MixColumns(Roundkey, 2)
     for i in range(4):
-        for j in range(len(state[0])):
+        for j in range(Nb):
             state[i][j] ^= Roundkey[i][j]
     return state
 
@@ -119,8 +120,8 @@ def SubBytes(state, mode):
     :param state:
     :return: ...
     '''
-    for i in range(len(state)):
-        for j in range(len(state[0])):
+    for i in range(4):
+        for j in range(Nb):
             x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
             if mode == 1:
                 state[i][j] = S_BOX[x][y]
@@ -162,7 +163,7 @@ def KeyExpansion(key, Nk, Nr, mode):
     # divide key into words
     for i in range(Nk):
         key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
-    word_num = 4 * (NrComputer(Nk) + 1)
+    word_num = Nb * (Nr + 1)
     # compute Rcon
     Rcon = [0 for i in range(14)]
     Rcon[0] = 1
@@ -172,7 +173,7 @@ def KeyExpansion(key, Nk, Nr, mode):
     w = [0 for i in range(word_num)]
     for i in range(Nk):
         w[i] = key_word_list[i]
-    for i in range(4, word_num):
+    for i in range(Nk, word_num):
         temp = w[i - 1]
         if i % Nk == 0:
             temp = Key_Sub(temp) ^ (Rcon[i // Nk - 1] << 24)
@@ -233,7 +234,7 @@ def AES(s, key, mode, Nk):
 
 if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
+    Nk = int(input("keylen= ")) // 32
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
-    Nk = int(input("keylen= ")) // 32
     print("\n>>>result: " + hex(AES(p, k, mode, Nk)))
