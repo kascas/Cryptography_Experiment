@@ -1,4 +1,5 @@
 import os
+from Sbox import *
 from GF_compute import *
 from GF_GCD import *
 
@@ -10,6 +11,10 @@ def ByteTransfer(p, total):
         List.append((p >> ((total - i - 1) * 8)) & int("ff", 16))
     return List
 '''
+
+S_BOX = SboxCreater()
+S_BOX_I = Sbox_I_Creater()
+
 
 def GF_MatrixMulti(a, b):
     result = [[0 for i in range(len(b[0]))] for j in range(len(a))]
@@ -30,49 +35,6 @@ def GF_MatrixPlus(a, b):
     return result
 
 
-def S_BoxCreater():
-    '''
-    this function is used to create s-box
-    :return: s-box
-    '''
-    array = [[0 for i in range(16)] for j in range(16)]
-    # use GCD to compute inverse
-    for x in range(16):
-        for y in range(16):
-            if x == 0 and y == 0:
-                array[x][y] = 0
-            else:
-                array[x][y] = GF_GCD((x << 4) + y, int("11b", 16))[1]
-    matrix = [
-        [1, 0, 0, 0, 1, 1, 1, 1],
-        [1, 1, 0, 0, 0, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 1],
-        [1, 1, 1, 1, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 0, 0],
-        [0, 0, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 1, 1, 1, 1, 1]
-    ]
-    c = [
-        [1], [1], [0], [0], [0], [1], [1], [0]
-    ]
-    # use matrix-plus and matrix-multi to compute
-    for i in range(16):
-        for j in range(16):
-            s, s_array = array[i][j], [[0 for i in range(1)] for j in range(8)]
-            for k in range(8):
-                s_array[k][0] = (s >> k) & 1
-            temp, result = GF_MatrixPlus(GF_MatrixMulti(matrix, s_array), c), 0
-            for k in range(8):
-                result <<= 1
-                result = result + temp[7 - k][0]
-            array[i][j] = result
-    return array
-
-
-S_BOX = S_BoxCreater()
-
-
 def NrComputer(Nk):
     '''
     this function is used to compute Nr according to Nk
@@ -87,7 +49,7 @@ def NrComputer(Nk):
         return 14
 
 
-def ShiftRows(state):
+def ShiftRows(state, mode):
     '''
     this function is used to ShiftRows
     :param state:
@@ -101,43 +63,57 @@ def ShiftRows(state):
             temp <<= 8
             temp += state[i][j]
         for j in range(move[i]):
-            temp = ((temp << 8) & ((1 << Nb * 8) - 1)) + (temp >> ((Nb - 1) * 8))
+            if mode == 1:
+                temp = ((temp << 8) & ((1 << Nb * 8) - 1)) + (temp >> ((Nb - 1) * 8))
+            elif mode == 2:
+                temp = (temp >> 8) + ((temp & int("0xff", 16)) << ((Nb - 1) * 8))
         List = temp.to_bytes(4, 'big')
         for j in range(Nb):
             state[i][j] = List[j]
     return state
 
 
-def MixColumns(state):
+def MixColumns(state, mode):
     '''
     this function is used to MixColumns
     :param state:
     :return: ...
     '''
-    matrix = [
-        [2, 3, 1, 1],
-        [1, 2, 3, 1],
-        [1, 1, 2, 3],
-        [3, 1, 1, 2]
-    ]
+    matrix = []
+    if mode == 1:
+        matrix = [
+            [2, 3, 1, 1],
+            [1, 2, 3, 1],
+            [1, 1, 2, 3],
+            [3, 1, 1, 2]
+        ]
+    elif mode == 2:
+        matrix = [
+            [14, 11, 13, 9],
+            [9, 14, 11, 13],
+            [13, 9, 14, 11],
+            [11, 13, 9, 14]
+        ]
     result = GF_MatrixMulti(matrix, state)
     return result
 
 
-def AddRoundKey(state, Roundkey):
+def AddRoundKey(state, Roundkey, mode):
     '''
     add RoundKey
     :param state:
     :param Roundkey:
     :return: ...
     '''
+    if mode == 2:
+        Roundkey = MixColumns(Roundkey, 2)
     for i in range(4):
         for j in range(len(state[0])):
             state[i][j] ^= Roundkey[i][j]
     return state
 
 
-def SubBytes(state):
+def SubBytes(state, mode):
     '''
     this function is used to SubBytes
     :param state:
@@ -146,7 +122,10 @@ def SubBytes(state):
     for i in range(len(state)):
         for j in range(len(state[0])):
             x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
-            state[i][j] = S_BOX[x][y]
+            if mode == 1:
+                state[i][j] = S_BOX[x][y]
+            elif mode == 2:
+                state[i][j] = S_BOX_I[x][y]
     return state
 
 
@@ -171,7 +150,7 @@ def Key_Sub(w):
     return w_sub
 
 
-def KeyExpansion(key, Nk, Nr):
+def KeyExpansion(key, Nk, Nr, mode):
     '''
     this function is used for KeyExpansion
     :param key:
@@ -209,6 +188,8 @@ def KeyExpansion(key, Nk, Nr):
         for j in range(4):
             for k in range(4):
                 key_array[i][j][k] = temp[k][j]
+    if mode == 2:
+        key_array.reverse()
     return key_array
 
 
@@ -236,22 +217,23 @@ def Matrix_into_Text(state):
 def AES(s, key, mode, Nk):
     Nr = NrComputer(Nk)
     state = Text_into_Matrix(s)
-    key_list = KeyExpansion(key, Nk, Nr)
-    state = AddRoundKey(state, key_list[0])
+    key_list = KeyExpansion(key, Nk, Nr, mode)
+    state = AddRoundKey(state, key_list[0], 1)
     for i in range(1, Nr):
-        state = SubBytes(state)
-        state = ShiftRows(state)
-        state = MixColumns(state)
-        state = AddRoundKey(state, key_list[i])
-    state = SubBytes(state)
-    state = ShiftRows(state)
-    state = AddRoundKey(state, key_list[Nr])
+        state = SubBytes(state, mode)
+        state = ShiftRows(state, mode)
+        state = MixColumns(state, mode)
+        state = AddRoundKey(state, key_list[i], mode)
+    state = SubBytes(state, mode)
+    state = ShiftRows(state, mode)
+    state = AddRoundKey(state, key_list[Nr], 1)
     result = Matrix_into_Text(state)
     return result
 
 
 if __name__ == "__main__":
+    mode = int(input("mode: [1]crypt, [2]decrypt  "))
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
     Nk = int(input("keylen= ")) // 32
-    print("\n>>>result: " + hex(AES(p, k, 1, Nk)))
+    print("\n>>>result: " + hex(AES(p, k, mode, Nk)))
