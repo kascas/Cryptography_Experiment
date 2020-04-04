@@ -108,7 +108,7 @@ def ShiftRows(state):
             temp += state[i][j]
         for j in range(move[i]):
             temp = ((temp << 8) & ((1 << Nb * 8) - 1)) + (temp >> ((Nb - 1) * 8))
-        List = ByteTransfer(temp, Nb)
+        List = temp.to_bytes(4, 'big')
         for j in range(Nb):
             state[i][j] = List[j]
     return state
@@ -190,15 +190,15 @@ def KeyExpansion(key, Nk, Nr):
     for i in range(Nk):
         key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
     word_num = 4 * (NrComputer(Nk) + 1)
-    w = [0 for i in range(word_num)]
-    for i in range(Nk):
-        w[i] = key_word_list[i]
+    # compute Rcon
     Rcon = [0 for i in range(14)]
     Rcon[0] = 1
-    # compute Rcon
     for i in range(1, 14):
         Rcon[i] = GF_multi(Rcon[i - 1], 2)
     # compute w[i]
+    w = [0 for i in range(word_num)]
+    for i in range(Nk):
+        w[i] = key_word_list[i]
     for i in range(4, word_num):
         temp = w[i - 1]
         if i % Nk == 0:
@@ -211,7 +211,7 @@ def KeyExpansion(key, Nk, Nr):
     for i in range(Nr + 1):
         temp = []
         for j in range(4):
-            temp.append(ByteTransfer(w[i * 4 + j], 4))
+            temp.append(w[i * 4 + j].to_bytes(4, 'big'))
         for j in range(4):
             for k in range(4):
                 key_array[i][j][k] = temp[k][j]
@@ -224,7 +224,7 @@ def Text_into_Matrix(s):
     :param s:
     :return: a matrix
     '''
-    temp, matrix = ByteTransfer(s, 16), [[] for i in range(4)]
+    temp, matrix = s.to_bytes(16, 'big'), [[] for i in range(4)]
     for i in range(16):
         matrix[i % 4].append(temp[i])
     return matrix
