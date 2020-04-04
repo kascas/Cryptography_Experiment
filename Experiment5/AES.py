@@ -2,20 +2,14 @@ import os
 from GF_compute import *
 from GF_GCD import *
 
-
+'''
 def ByteTransfer(p, total):
-    '''
-    this function is used to divide 'int' into bytes
-    :param p:
-    :param total:
-    :return: byte-list
-    '''
     # length is the length of p(bits), total is the number of bytes
     List = []
     for i in range(total):
         List.append((p >> ((total - i - 1) * 8)) & int("ff", 16))
     return List
-
+'''
 
 def GF_MatrixMulti(a, b):
     result = [[0 for i in range(len(b[0]))] for j in range(len(a))]
