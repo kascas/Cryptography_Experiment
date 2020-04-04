@@ -2,38 +2,12 @@ import os
 from Sbox import *
 from GF_compute import *
 from GF_GCD import *
-
-'''
-def ByteTransfer(p, total):
-    # length is the length of p(bits), total is the number of bytes
-    List = []
-    for i in range(total):
-        List.append((p >> ((total - i - 1) * 8)) & int("ff", 16))
-    return List
-'''
+from GF_Matrix import *
+from Text_Matrix_Transfer import *
 
 S_BOX = SboxCreater()
 S_BOX_I = Sbox_I_Creater()
 Nb = 4
-
-
-def GF_MatrixMulti(a, b):
-    result = [[0 for i in range(len(b[0]))] for j in range(len(a))]
-    for i in range(len(a)):
-        for j in range(len(b[0])):
-            temp = 0
-            for k in range(len(a[0])):
-                temp = GF_plus(temp, GF_multi(a[i][k], b[k][j]))
-            result[i][j] = temp
-    return result
-
-
-def GF_MatrixPlus(a, b):
-    result = [[0 for i in range(len(a[0]))] for j in range(len(a))]
-    for i in range(len(a)):
-        for j in range(len(a[0])):
-            result[i][j] = GF_plus(a[i][j], b[i][j])
-    return result
 
 
 def NrComputer(Nk):
@@ -130,14 +104,16 @@ def SubBytes(state, mode):
     return state
 
 
-def Key_Sub(w):
+def Key_Sub(w, Nk):
     '''
     this function is used to do SubByte to w
     :param w:
     :return: value after sub
     '''
     # left move
-    w, w_byte = ((w << 8) & int("0xffffffff", 16)) + (w >> 24), []
+    w_byte = []
+    if Nk <= 6:
+        w = ((w << 8) & int("0xffffffff", 16)) + (w >> 24)
     # divide w into 4 bytes
     for i in range(4):
         w_byte.append((w >> ((3 - i) * 8)) & int("0xff", 16))
@@ -176,9 +152,9 @@ def KeyExpansion(key, Nk, Nr, mode):
     for i in range(Nk, word_num):
         temp = w[i - 1]
         if i % Nk == 0:
-            temp = Key_Sub(temp) ^ (Rcon[i // Nk - 1] << 24)
+            temp = Key_Sub(temp, 0) ^ (Rcon[i // Nk - 1] << 24)
         elif (Nk > 6) and (i % Nk == 4):
-            temp = Key_Sub(temp)
+            temp = Key_Sub(temp, Nk)
         w[i] = temp ^ w[i - Nk]
     # put w into byte-matrix
     key_array = [[[0 for k in range(4)] for i in range(4)] for j in range(Nr + 1)]
@@ -194,31 +170,9 @@ def KeyExpansion(key, Nk, Nr, mode):
     return key_array
 
 
-def Text_into_Matrix(s):
-    '''
-    transfer text into byte-matrix
-    :param s:
-    :return: a matrix
-    '''
-    temp, matrix = s.to_bytes(16, 'big'), [[] for i in range(4)]
-    for i in range(16):
-        matrix[i % 4].append(temp[i])
-    return matrix
-
-
-def Matrix_into_Text(state):
-    result = 0
-    for i in range(4):
-        for j in range(4):
-            result <<= 8
-            result += state[j][i]
-    return result
-
-
-def AES(s, key, mode, Nk):
+def AES(s, key_list, mode, Nk):
     Nr = NrComputer(Nk)
     state = Text_into_Matrix(s)
-    key_list = KeyExpansion(key, Nk, Nr, mode)
     state = AddRoundKey(state, key_list[0], 1)
     for i in range(1, Nr):
         state = SubBytes(state, mode)
@@ -237,4 +191,5 @@ if __name__ == "__main__":
     Nk = int(input("keylen= ")) // 32
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
-    print("\n>>>result: " + hex(AES(p, k, mode, Nk)))
+    key_list = KeyExpansion(k, Nk, NrComputer(Nk), mode)
+    print("\n>>>result: " + hex(AES(p, key_list, mode, Nk)))
