@@ -5,6 +5,7 @@ from AES import *
 
 def AES_crypt():
     p, key, crypt_result = int(text_in.get(), 16), int(key_in.get(), 16), 0
+    result_text.delete(1.0, tk.END)
     if len(hex(key).replace("0x", "")) <= 32:
         Nk = 4
     elif len(hex(key).replace("0x", "")) <= 48:
@@ -16,13 +17,13 @@ def AES_crypt():
         return
     key_list = KeyExpansion(key, Nk, NrComputer(Nk), 1)
     crypt_result = AES(p, key_list, 1, Nk)
-    result_text.delete(1.0, tk.END)
     result_text.insert(1.0, hex(crypt_result).replace("0x", "").zfill(32))
     return
 
 
 def AES_decrypt():
     p, key, decrypt_result = int(text_in.get(), 16), int(key_in.get(), 16), 0
+    result_text.delete(1.0, tk.END)
     if len(hex(key).replace("0x", "")) <= 32:
         Nk = 4
     elif len(hex(key).replace("0x", "")) <= 48:
@@ -34,7 +35,6 @@ def AES_decrypt():
         return
     key_list = KeyExpansion(key, Nk, NrComputer(Nk), 2)
     decrypt_result = AES(p, key_list, 2, Nk)
-    result_text.delete(1.0, tk.END)
     result_text.insert(1.0, hex(decrypt_result).replace("0x", "").zfill(32))
     return
 
