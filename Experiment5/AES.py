@@ -193,3 +193,4 @@ if __name__ == "__main__":
     k = int(input("key= "), 16)
     key_list = KeyExpansion(k, Nk, NrComputer(Nk), mode)
     print("\n>>>result: " + hex(AES(p, key_list, mode, Nk)))
+    os.system("pause")
