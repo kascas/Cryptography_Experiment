@@ -140,13 +140,17 @@ def SubBytes(state, mode):
     :param state:
     :return: ...
     '''
-    for i in range(4):
-        for j in range(Nb):
-            x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
-            if mode == 1:
+    if mode == 1:
+        for i in range(4):
+            for j in range(Nb):
+                x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
                 state[i][j] = S_BOX[x][y]
-            elif mode == 2:
+    elif mode == 2:
+        for i in range(4):
+            for j in range(Nb):
+                x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
                 state[i][j] = S_BOX_I[x][y]
+
     return state
 
 
