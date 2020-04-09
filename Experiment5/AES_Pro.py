@@ -6,10 +6,26 @@ from GF_GCD import *
 from GF_Matrix import *
 from Text_Matrix_Transfer import *
 
+############################################################################################################
+# "GFMul{x}(s)" is the function to compute s*x on GF(2^8)                                                  #
+# "NrComputer" compute Nr according to Nk                                                                  #
+# "Key_Sub" do byte-sub operation to a word of key                                                         #
+# "NkJudge" select the mode from AES-128, AES-192, AES-256 according to the length of key                  #
+# There are "AES", "encrypt", "decrypt" for AES:                                                           #
+#       "AES(s,key,mode)" has an argument "mode", which selects mode between "encrypt" and "decrypt"       #
+#       "encrypt(s,key)" and "decrypt(s,key)" do not have argument "mode", only for encrypt or decrypt     #
+#       (They are just two style of programming, nothing different)                                        #
+# "SboxCreater" and "Sbox_I_Creater" are in Sbox.py:                                                       #
+#       "SboxCreater" compute Sbox                                                                         #
+#       "Sbox_I_Creater" compute the inverse of Sbox                                                       #
+# "Text_into_Matrix" and "Matrix_into_Text" are in Text_Matrix_Transfer.py:                                #
+#       "Text_into_Matrix" store plaintext or ciphertext into "state"                                      #
+#       "Matrix_into_Text" get plaintext or ciphertext from "state"                                        #
+############################################################################################################
+
 S_BOX = SboxCreater()
 S_BOX_I = Sbox_I_Creater()
 Nb = 4
-
 
 def GFMul2(s):
     result = s << 1
@@ -303,4 +319,7 @@ if __name__ == "__main__":
     end = time.clock()
     print("\n>>>result: " + hex(c))
     print("AES took time: {} s".format((end - start)))
+    print("\n\nTest encrypt and decrypt: ")
+    print("encrypt: {}".format(hex(encrypt(p,k))))
+    print("decrypt: {}".format(hex(decrypt(p, k))))
     os.system("pause")
