@@ -254,6 +254,46 @@ def AES(s, key, mode):
     return result
 
 
+def encrypt(s, key):
+    Nk = NkJudge(key)
+    if Nk == 0:
+        return -1
+    Nr = NrComputer(Nk)
+    state = Text_into_Matrix(s)
+    key_list = KeyExpansion(k, Nk, NrComputer(Nk), 1)
+    state = AddRoundKey(state, key_list[0], 1)
+    for i in range(1, Nr):
+        state = SubBytes(state, 1)
+        state = ShiftRows(state, 1)
+        state = MixColumns(state, 1)
+        state = AddRoundKey(state, key_list[i], 1)
+    state = SubBytes(state, 1)
+    state = ShiftRows(state, 1)
+    state = AddRoundKey(state, key_list[Nr], 1)
+    result = Matrix_into_Text(state)
+    return result
+
+
+def decrypt(s, key):
+    Nk = NkJudge(key)
+    if Nk == 0:
+        return -1
+    Nr = NrComputer(Nk)
+    state = Text_into_Matrix(s)
+    key_list = KeyExpansion(k, Nk, NrComputer(Nk), 2)
+    state = AddRoundKey(state, key_list[0], 1)
+    for i in range(1, Nr):
+        state = SubBytes(state, 2)
+        state = ShiftRows(state, 2)
+        state = MixColumns(state, 2)
+        state = AddRoundKey(state, key_list[i], 2)
+    state = SubBytes(state, 2)
+    state = ShiftRows(state, 2)
+    state = AddRoundKey(state, key_list[Nr], 1)
+    result = Matrix_into_Text(state)
+    return result
+
+
 if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
     p = int(input("text= "), 16)
