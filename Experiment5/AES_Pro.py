@@ -11,6 +11,47 @@ S_BOX_I = Sbox_I_Creater()
 Nb = 4
 
 
+def GFMul2(s):
+    result = s << 1
+    a7 = result & 0x00000100
+    if (a7 != 0):
+        result = result & 0x000000ff
+        result = result ^ 0x1b
+    return result
+
+
+def GFMul3(s):
+    return GFMul2(s) ^ s
+
+
+def GFMul4(s):
+    return GFMul2(GFMul2(s))
+
+
+def GFMul8(s):
+    return GFMul2(GFMul4(s))
+
+
+def GFMul9(s):
+    return GFMul8(s) ^ s
+
+
+def GFMul11(s):
+    return GFMul9(s) ^ GFMul2(s)
+
+
+def GFMul12(s):
+    return GFMul8(s) ^ GFMul4(s)
+
+
+def GFMul13(s):
+    return GFMul12(s) ^ s
+
+
+def GFMul14(s):
+    return GFMul12(s) ^ GFMul2(s)
+
+
 def NrComputer(Nk):
     '''
     this function is used to compute Nr according to Nk
@@ -30,23 +71,6 @@ def ShiftRows(state, mode):
     this function is used to ShiftRows
     :param state:
     :return: ...
-    '''
-    '''
-    move = [0, 1, 2, 3]
-    for i in range(4):
-        # temp is the value of the s[i]s[i+4]s[i+8]s[i+12]
-        temp = 0
-        for j in range(Nb):
-            temp <<= 8
-            temp += state[i][j]
-        for j in range(move[i]):
-            if mode == 1:
-                temp = ((temp << 8) & ((1 << Nb * 8) - 1)) + (temp >> ((Nb - 1) * 8))
-            elif mode == 2:
-                temp = (temp >> 8) + ((temp & int("0xff", 16)) << ((Nb - 1) * 8))
-        List = temp.to_bytes(4, 'big')
-        for j in range(Nb):
-            state[i][j] = List[j]
     '''
     if mode == 1:
         state[1][0], state[1][1], state[1][2], state[1][3] = state[1][1], state[1][2], state[1][3], state[1][0]
@@ -83,7 +107,23 @@ def MixColumns(state, mode):
         ]
     result = GF_MatrixMulti(matrix, state)
     '''
-
+    result = [[0 for i in range(4)] for j in range(4)]
+    if mode == 1:
+        for i in range(4):
+            result[0][i] = GF_multi(2, state[0][i]) ^ GF_multi(3, state[1][i]) ^ state[2][i] ^ state[3][i]
+            result[1][i] = GF_multi(2, state[1][i]) ^ GF_multi(3, state[2][i]) ^ state[0][i] ^ state[3][i]
+            result[2][i] = GF_multi(2, state[2][i]) ^ GF_multi(3, state[3][i]) ^ state[0][i] ^ state[1][i]
+            result[3][i] = GF_multi(2, state[3][i]) ^ GF_multi(3, state[0][i]) ^ state[1][i] ^ state[2][i]
+    elif mode == 2:
+        for i in range(4):
+            result[0][i] = GF_multi(14, state[0][i]) ^ GF_multi(11, state[1][i]) ^ \
+                           GF_multi(13, state[2][i]) ^ GF_multi(9, state[3][i])
+            result[1][i] = GF_multi(9, state[0][i]) ^ GF_multi(14, state[1][i]) ^ \
+                           GF_multi(11, state[2][i]) ^ GF_multi(13, state[3][i])
+            result[2][i] = GF_multi(13, state[0][i]) ^ GF_multi(9, state[1][i]) ^ \
+                           GF_multi(14, state[2][i]) ^ GF_multi(11, state[3][i])
+            result[3][i] = GF_multi(11, state[0][i]) ^ GF_multi(13, state[1][i]) ^ \
+                           GF_multi(9, state[2][i]) ^ GF_multi(14, state[3][i])
     return result
 
 
