@@ -89,41 +89,23 @@ def MixColumns(state, mode):
     :param state:
     :return: ...
     '''
-    '''
-    matrix = []
-    if mode == 1:
-        matrix = [
-            [2, 3, 1, 1],
-            [1, 2, 3, 1],
-            [1, 1, 2, 3],
-            [3, 1, 1, 2]
-        ]
-    elif mode == 2:
-        matrix = [
-            [14, 11, 13, 9],
-            [9, 14, 11, 13],
-            [13, 9, 14, 11],
-            [11, 13, 9, 14]
-        ]
-    result = GF_MatrixMulti(matrix, state)
-    '''
     result = [[0 for i in range(4)] for j in range(4)]
     if mode == 1:
         for i in range(4):
-            result[0][i] = GF_multi(2, state[0][i]) ^ GF_multi(3, state[1][i]) ^ state[2][i] ^ state[3][i]
-            result[1][i] = GF_multi(2, state[1][i]) ^ GF_multi(3, state[2][i]) ^ state[0][i] ^ state[3][i]
-            result[2][i] = GF_multi(2, state[2][i]) ^ GF_multi(3, state[3][i]) ^ state[0][i] ^ state[1][i]
-            result[3][i] = GF_multi(2, state[3][i]) ^ GF_multi(3, state[0][i]) ^ state[1][i] ^ state[2][i]
+            result[0][i] = GFMul2(state[0][i]) ^ GFMul3(state[1][i]) ^ state[2][i] ^ state[3][i]
+            result[1][i] = GFMul2(state[1][i]) ^ GFMul3(state[2][i]) ^ state[0][i] ^ state[3][i]
+            result[2][i] = GFMul2(state[2][i]) ^ GFMul3(state[3][i]) ^ state[0][i] ^ state[1][i]
+            result[3][i] = GFMul2(state[3][i]) ^ GFMul3(state[0][i]) ^ state[1][i] ^ state[2][i]
     elif mode == 2:
         for i in range(4):
-            result[0][i] = GF_multi(14, state[0][i]) ^ GF_multi(11, state[1][i]) ^ \
-                           GF_multi(13, state[2][i]) ^ GF_multi(9, state[3][i])
-            result[1][i] = GF_multi(9, state[0][i]) ^ GF_multi(14, state[1][i]) ^ \
-                           GF_multi(11, state[2][i]) ^ GF_multi(13, state[3][i])
-            result[2][i] = GF_multi(13, state[0][i]) ^ GF_multi(9, state[1][i]) ^ \
-                           GF_multi(14, state[2][i]) ^ GF_multi(11, state[3][i])
-            result[3][i] = GF_multi(11, state[0][i]) ^ GF_multi(13, state[1][i]) ^ \
-                           GF_multi(9, state[2][i]) ^ GF_multi(14, state[3][i])
+            result[0][i] = GFMul14(state[0][i]) ^ GFMul11(state[1][i]) ^ \
+                           GFMul13(state[2][i]) ^ GFMul9(state[3][i])
+            result[1][i] = GFMul9(state[0][i]) ^ GFMul14(state[1][i]) ^ \
+                           GFMul11(state[2][i]) ^ GFMul13(state[3][i])
+            result[2][i] = GFMul13(state[0][i]) ^ GFMul9(state[1][i]) ^ \
+                           GFMul14(state[2][i]) ^ GFMul11(state[3][i])
+            result[3][i] = GFMul11(state[0][i]) ^ GFMul13(state[1][i]) ^ \
+                           GFMul9(state[2][i]) ^ GFMul14(state[3][i])
     return result
 
 
@@ -229,26 +211,10 @@ def AES(s, key_list, mode, Nk):
     state = Text_into_Matrix(s)
     state = AddRoundKey(state, key_list[0], 1)
     for i in range(1, Nr):
-        start1 = time.clock()
         state = SubBytes(state, mode)
-        end1 = time.clock()
-        if i == 6:
-            print("sub time: {}".format((end1 - start1) * 1000000))
-        start2 = time.clock()
         state = ShiftRows(state, mode)
-        end2 = time.clock()
-        if i == 6:
-            print("shift time: {}".format((end2 - start2) * 1000000))
-        start3 = time.clock()
         state = MixColumns(state, mode)
-        end3 = time.clock()
-        if i == 6:
-            print("mix time: {}".format((end3 - start3) * 1000000))
-        start4 = time.clock()
         state = AddRoundKey(state, key_list[i], mode)
-        end4 = time.clock()
-        if i == 6:
-            print("add time: {}".format((end4 - start4) * 1000000))
     state = SubBytes(state, mode)
     state = ShiftRows(state, mode)
     state = AddRoundKey(state, key_list[Nr], 1)
@@ -262,5 +228,8 @@ if __name__ == "__main__":
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
     key_list = KeyExpansion(k, Nk, NrComputer(Nk), mode)
+    start = time.clock()
     print("\n>>>result: " + hex(AES(p, key_list, mode, Nk)))
+    end = time.clock()
+    print("AES took time: {} s".format((end - start)))
     os.system("pause")
