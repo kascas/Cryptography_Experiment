@@ -73,13 +73,19 @@ def ShiftRows(state, mode):
     :return: ...
     '''
     if mode == 1:
-        state[1][0], state[1][1], state[1][2], state[1][3] = state[1][1], state[1][2], state[1][3], state[1][0]
-        state[2][0], state[2][1], state[2][2], state[2][3] = state[2][2], state[2][3], state[2][0], state[2][1]
-        state[3][0], state[3][1], state[3][2], state[3][3] = state[3][3], state[3][0], state[3][1], state[3][2]
+        state[1][0], state[1][1], state[1][2], state[1][3] = \
+            state[1][1], state[1][2], state[1][3], state[1][0]
+        state[2][0], state[2][1], state[2][2], state[2][3] = \
+            state[2][2], state[2][3], state[2][0], state[2][1]
+        state[3][0], state[3][1], state[3][2], state[3][3] = \
+            state[3][3], state[3][0], state[3][1], state[3][2]
     elif mode == 2:
-        state[1][0], state[1][1], state[1][2], state[1][3] = state[1][3], state[1][0], state[1][1], state[1][2]
-        state[2][0], state[2][1], state[2][2], state[2][3] = state[2][2], state[2][3], state[2][0], state[2][1]
-        state[3][0], state[3][1], state[3][2], state[3][3] = state[3][1], state[3][2], state[3][3], state[3][0]
+        state[1][0], state[1][1], state[1][2], state[1][3] = \
+            state[1][3], state[1][0], state[1][1], state[1][2]
+        state[2][0], state[2][1], state[2][2], state[2][3] = \
+            state[2][2], state[2][3], state[2][0], state[2][1]
+        state[3][0], state[3][1], state[3][2], state[3][3] = \
+            state[3][1], state[3][2], state[3][3], state[3][0]
     return state
 
 
@@ -92,10 +98,14 @@ def MixColumns(state, mode):
     result = [[0 for i in range(4)] for j in range(4)]
     if mode == 1:
         for i in range(4):
-            result[0][i] = GFMul2(state[0][i]) ^ GFMul3(state[1][i]) ^ state[2][i] ^ state[3][i]
-            result[1][i] = GFMul2(state[1][i]) ^ GFMul3(state[2][i]) ^ state[0][i] ^ state[3][i]
-            result[2][i] = GFMul2(state[2][i]) ^ GFMul3(state[3][i]) ^ state[0][i] ^ state[1][i]
-            result[3][i] = GFMul2(state[3][i]) ^ GFMul3(state[0][i]) ^ state[1][i] ^ state[2][i]
+            result[0][i] = GFMul2(state[0][i]) ^ GFMul3(state[1][i]) ^ \
+                           state[2][i] ^ state[3][i]
+            result[1][i] = GFMul2(state[1][i]) ^ GFMul3(state[2][i]) ^ \
+                           state[0][i] ^ state[3][i]
+            result[2][i] = GFMul2(state[2][i]) ^ GFMul3(state[3][i]) ^ \
+                           state[0][i] ^ state[1][i]
+            result[3][i] = GFMul2(state[3][i]) ^ GFMul3(state[0][i]) ^ \
+                           state[1][i] ^ state[2][i]
     elif mode == 2:
         for i in range(4):
             result[0][i] = GFMul14(state[0][i]) ^ GFMul11(state[1][i]) ^ \
@@ -206,9 +216,27 @@ def KeyExpansion(key, Nk, Nr, mode):
     return key_array
 
 
-def AES(s, key_list, mode, Nk):
+def NkJudge(key):
+    Nk = 0
+    if len(hex(key).replace("0x", "")) <= 32:
+        Nk = 4
+    elif len(hex(key).replace("0x", "")) <= 48:
+        Nk = 6
+    elif len(hex(key).replace("0x", "")) <= 64:
+        Nk = 8
+    else:
+        print("keylen > 256")
+        return 0
+    return Nk
+
+
+def AES(s, key, mode):
+    Nk = NkJudge(key)
+    if Nk == 0:
+        return -1
     Nr = NrComputer(Nk)
     state = Text_into_Matrix(s)
+    key_list = KeyExpansion(k, Nk, NrComputer(Nk), mode)
     state = AddRoundKey(state, key_list[0], 1)
     for i in range(1, Nr):
         state = SubBytes(state, mode)
@@ -224,12 +252,11 @@ def AES(s, key_list, mode, Nk):
 
 if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
-    Nk = int(input("keylen= ")) // 32
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
-    key_list = KeyExpansion(k, Nk, NrComputer(Nk), mode)
     start = time.clock()
-    print("\n>>>result: " + hex(AES(p, key_list, mode, Nk)))
+    c = AES(p, k, mode)
     end = time.clock()
+    print("\n>>>result: " + hex(c))
     print("AES took time: {} s".format((end - start)))
     os.system("pause")
