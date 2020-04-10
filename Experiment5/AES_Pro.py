@@ -2,30 +2,32 @@ import os
 import time
 from Sbox import *
 from GF_compute import *
-from GF_GCD import *
-from GF_Matrix import *
 from Text_Matrix_Transfer import *
 
 ############################################################################################################
 # "GFMul{x}(s)" is the function to compute s*x on GF(2^8)                                                  #
-# "NrComputer" compute Nr according to Nk                                                                  #
-# "Key_Sub" do byte-sub operation to a word of key                                                         #
-# "NkJudge" select the mode from AES-128, AES-192, AES-256 according to the length of key                  #
+# "NrComputer" computes Nr according to Nk                                                                  #
+# "Key_Sub" does byte-sub operation to a word of key                                                         #
+# "NkJudge" selects the mode from AES-128, AES-192, AES-256 according to the length of key                  #
 # There are "AES", "encrypt", "decrypt" for AES:                                                           #
 #       "AES(s,key,mode)" has an argument "mode", which selects mode between "encrypt" and "decrypt"       #
 #       "encrypt(s,key)" and "decrypt(s,key)" do not have argument "mode", only for encrypt or decrypt     #
 #       (They are just two style of programming, nothing different)                                        #
 # "SboxCreater" and "Sbox_I_Creater" are in Sbox.py:                                                       #
-#       "SboxCreater" compute Sbox                                                                         #
-#       "Sbox_I_Creater" compute the inverse of Sbox                                                       #
+#       "SboxCreater" computes Sbox                                                                         #
+#       "Sbox_I_Creater" computes the inverse of Sbox                                                       #
 # "Text_into_Matrix" and "Matrix_into_Text" are in Text_Matrix_Transfer.py:                                #
-#       "Text_into_Matrix" store plaintext or ciphertext into "state"                                      #
-#       "Matrix_into_Text" get plaintext or ciphertext from "state"                                        #
+#       "Text_into_Matrix" stores plaintext or ciphertext into "state"                                      #
+#       "Matrix_into_Text" gets plaintext or ciphertext from "state"                                        #
 ############################################################################################################
 
 S_BOX = SboxCreater()
 S_BOX_I = Sbox_I_Creater()
 Nb = 4
+# compute Rcon
+RC = [1 for i in range(14)]
+for i in range(1, 14):
+    RC[i] = GF_multi(RC[i - 1], 2)
 
 def GFMul2(s):
     result = s << 1
@@ -206,11 +208,6 @@ def KeyExpansion(key, Nk, Nr, mode):
     for i in range(Nk):
         key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
     word_num = Nb * (Nr + 1)
-    # compute Rcon
-    Rcon = [0 for i in range(14)]
-    Rcon[0] = 1
-    for i in range(1, 14):
-        Rcon[i] = GF_multi(Rcon[i - 1], 2)
     # compute w[i]
     w = [0 for i in range(word_num)]
     for i in range(Nk):
@@ -218,7 +215,7 @@ def KeyExpansion(key, Nk, Nr, mode):
     for i in range(Nk, word_num):
         temp = w[i - 1]
         if i % Nk == 0:
-            temp = Key_Sub(temp, 0) ^ (Rcon[i // Nk - 1] << 24)
+            temp = Key_Sub(temp, 0) ^ (RC[i // Nk - 1] << 24)
         elif (Nk > 6) and (i % Nk == 4):
             temp = Key_Sub(temp, Nk)
         w[i] = temp ^ w[i - Nk]
@@ -314,12 +311,12 @@ if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
-    start = time.clock()
+    # start = time.clock()
     c = AES(p, k, mode)
-    end = time.clock()
+    # end = time.clock()
     print("\n>>>result: " + hex(c))
-    print("AES took time: {} s".format((end - start)))
-    print("\n\nTest encrypt and decrypt: ")
-    print("encrypt: {}".format(hex(encrypt(p,k))))
-    print("decrypt: {}".format(hex(decrypt(p, k))))
+    # print("AES took time: {} s".format((end - start)))
+    # print("\n\nTest encrypt and decrypt: ")
+    # print("encrypt: {}".format(hex(encrypt(p,k))))
+    # print("decrypt: {}".format(hex(decrypt(p, k))))
     os.system("pause")
