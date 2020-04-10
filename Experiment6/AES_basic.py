@@ -316,12 +316,12 @@ if __name__ == "__main__":
     c, start, end = 0, 0, 0
     if mode == 1:
         start = time.perf_counter()
-        for i in range(10000):
+        for i in range(1000):
             c = encrypt(p, k)
         end = time.perf_counter()
     else:
         start = time.perf_counter()
-        for i in range(10000):
+        for i in range(1000):
             c = decrypt(p, k)
         end = time.perf_counter()
     print("\n>>>result: " + hex(c))
