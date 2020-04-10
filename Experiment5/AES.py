@@ -6,19 +6,19 @@ from Text_Matrix_Transfer import *
 
 ############################################################################################################
 # "GFMul{x}(s)" is the function to compute s*x on GF(2^8)                                                  #
-# "NrComputer" computes Nr according to Nk                                                                  #
-# "Key_Sub" does byte-sub operation to a word of key                                                         #
-# "NkJudge" selects the mode from AES-128, AES-192, AES-256 according to the length of key                  #
+# "NrComputer" computes Nr according to Nk                                                                 #
+# "Key_Sub" does byte-sub operation to a word of key                                                       #
+# "NkJudge" selects the mode from AES-128, AES-192, AES-256 according to the length of key                 #
 # There are "AES", "encrypt", "decrypt" for AES:                                                           #
 #       "AES(s,key,mode)" has an argument "mode", which selects mode between "encrypt" and "decrypt"       #
 #       "encrypt(s,key)" and "decrypt(s,key)" do not have argument "mode", only for encrypt or decrypt     #
 #       (They are just two style of programming, nothing different)                                        #
 # "SboxCreater" and "Sbox_I_Creater" are in Sbox.py:                                                       #
-#       "SboxCreater" computes Sbox                                                                         #
-#       "Sbox_I_Creater" computes the inverse of Sbox                                                       #
+#       "SboxCreater" computes Sbox                                                                        #
+#       "Sbox_I_Creater" computes the inverse of Sbox                                                      #
 # "Text_into_Matrix" and "Matrix_into_Text" are in Text_Matrix_Transfer.py:                                #
-#       "Text_into_Matrix" stores plaintext or ciphertext into "state"                                      #
-#       "Matrix_into_Text" gets plaintext or ciphertext from "state"                                        #
+#       "Text_into_Matrix" stores plaintext or ciphertext into "state"                                     #
+#       "Matrix_into_Text" gets plaintext or ciphertext from "state"                                       #
 ############################################################################################################
 
 S_BOX = SboxCreater()
@@ -28,6 +28,7 @@ Nb = 4
 RC = [1 for i in range(14)]
 for i in range(1, 14):
     RC[i] = GF_multi(RC[i - 1], 2)
+
 
 def GFMul2(s):
     result = s << 1
@@ -203,11 +204,10 @@ def KeyExpansion(key, Nk, Nr, mode):
     :param Nr:
     :return: a list for key
     '''
-    key_word_list = [0 for i in range(Nk)]
+    key_word_list, word_num = [0 for i in range(Nk)], Nb * (Nr + 1)
     # divide key into words
     for i in range(Nk):
         key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
-    word_num = Nb * (Nr + 1)
     # compute w[i]
     w = [0 for i in range(word_num)]
     for i in range(Nk):
