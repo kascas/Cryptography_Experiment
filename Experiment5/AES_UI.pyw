@@ -15,8 +15,7 @@ def AES_crypt():
     else:
         result_text.insert(1.0, "KeyLen > 256")
         return
-    key_list = KeyExpansion(key, Nk, NrComputer(Nk), 1)
-    crypt_result = AES(p, key_list, 1, Nk)
+    crypt_result = AES(p, key, 1)
     result_text.insert(1.0, hex(crypt_result).replace("0x", "").zfill(32))
     return
 
@@ -33,8 +32,7 @@ def AES_decrypt():
     else:
         result_text.insert(1.0, "KeyLen > 256")
         return
-    key_list = KeyExpansion(key, Nk, NrComputer(Nk), 2)
-    decrypt_result = AES(p, key_list, 2, Nk)
+    decrypt_result = AES(p, key, 2)
     result_text.insert(1.0, hex(decrypt_result).replace("0x", "").zfill(32))
     return
 
