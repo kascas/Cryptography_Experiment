@@ -311,9 +311,10 @@ if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
-    start = time.clock()
-    c = AES(p, k, mode)
-    end = time.clock()
+    start = time.perf_counter()
+    for i in range(1000):
+        c = AES(p, k, mode)
+    end = time.perf_counter()
     print("\n>>>result: " + hex(c))
     print("AES took time: {} s".format((end - start)))
     # print("\n\nTest encrypt and decrypt: ")

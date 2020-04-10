@@ -193,9 +193,10 @@ if __name__ == "__main__":
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
     key_list = KeyExpansion(k, Nk, NrComputer(Nk), mode)
-    start = time.clock()
-    c = AES(p, key_list, mode, Nk)
-    end = time.clock()
+    start = time.perf_counter()
+    for i in range(1000):
+        c = AES(p, key_list, mode, Nk)
+    end = time.perf_counter()
     print("\n>>>result: " + hex(c))
     print("AES took time: {} s".format((end - start)))
     os.system("pause")
