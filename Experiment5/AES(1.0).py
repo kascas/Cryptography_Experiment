@@ -1,4 +1,5 @@
 import os
+import time
 from Sbox import *
 from GF_compute import *
 from GF_GCD import *
@@ -192,5 +193,9 @@ if __name__ == "__main__":
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
     key_list = KeyExpansion(k, Nk, NrComputer(Nk), mode)
-    print("\n>>>result: " + hex(AES(p, key_list, mode, Nk)))
+    start = time.clock()
+    c = AES(p, key_list, mode, Nk)
+    end = time.clock()
+    print("\n>>>result: " + hex(c))
+    print("AES took time: {} s".format((end - start)))
     os.system("pause")
