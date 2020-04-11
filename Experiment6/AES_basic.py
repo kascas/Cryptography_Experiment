@@ -449,9 +449,8 @@ def NkJudge(key):
     return (Nk, Nr)
 
 
-def encrypt(s, key):
+def encrypt(state, key):
     Nk, Nr = NkJudge(key)
-    state = bytearray(s.to_bytes(16, 'big'))
     key_list = KeyExpansion(key, 1)
     state = AddRoundKey(state, key_list[0])
     for i in range(1, Nr):
@@ -465,9 +464,8 @@ def encrypt(s, key):
     return state
 
 
-def decrypt(s, key):
+def decrypt(state, key):
     Nk, Nr = NkJudge(key)
-    state = bytearray(s.to_bytes(16, 'big'))
     key_list = KeyExpansion(key, 2)
     state = AddRoundKey(state, key_list[0])
     for i in range(1, Nr):
@@ -479,25 +477,3 @@ def decrypt(s, key):
     state = InvShiftRows(state)
     state = AddRoundKey(state, key_list[Nr])
     return state
-
-
-if __name__ == "__main__":
-    mode = int(input("mode: [1]crypt, [2]decrypt  "))
-    p = int(input("text= "), 16)
-    k = int(input("key= "), 16)
-    c, start, end = "", 0, 0
-    if mode == 1:
-        start = time.perf_counter()
-        for i in range(10000):
-            state = encrypt(p, k)
-        end = time.perf_counter()
-    else:
-        start = time.perf_counter()
-        for i in range(10000):
-            state = decrypt(p, k)
-        end = time.perf_counter()
-    result = ""
-    for i in range(16):
-        result += hex(state[i]).replace("0x", "").zfill(2)
-    print("\n>>>result: " + result)
-    print("\nAES took time: {} s".format((end - start)))
