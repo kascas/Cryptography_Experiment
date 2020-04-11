@@ -6,16 +6,6 @@ import time
 # "NrComputer" computes Nr according to Nk                                                                 #
 # "Key_Sub" does byte-sub operation to a word of key                                                       #
 # "NkJudge" selects the mode from AES-128, AES-192, AES-256 according to the length of key                 #
-# There are "AES", "encrypt", "decrypt" for AES:                                                           #
-#       "AES(s,key,mode)" has an argument "mode", which selects mode between "encrypt" and "decrypt"       #
-#       "encrypt(s,key)" and "decrypt(s,key)" do not have argument "mode", only for encrypt or decrypt     #
-#       (They are just two style of programming, nothing different)                                        #
-# "SboxCreater" and "Sbox_I_Creater" are in Sbox.py:                                                       #
-#       "SboxCreater" computes Sbox                                                                        #
-#       "Sbox_I_Creater" computes the inverse of Sbox                                                      #
-# "Text_into_Matrix" and "Matrix_into_Text" are in Text_Matrix_Transfer.py:                                #
-#       "Text_into_Matrix" stores plaintext or ciphertext into "state"                                     #
-#       "Matrix_into_Text" gets plaintext or ciphertext from "state"                                       #
 ############################################################################################################
 
 
