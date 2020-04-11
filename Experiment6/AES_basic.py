@@ -335,81 +335,77 @@ def NrComputer(Nk):
 
 
 def ShiftRows(state):
-    state[1][0], state[1][1], state[1][2], state[1][3] = \
-        state[1][1], state[1][2], state[1][3], state[1][0]
-    state[2][0], state[2][1], state[2][2], state[2][3] = \
-        state[2][2], state[2][3], state[2][0], state[2][1]
-    state[3][0], state[3][1], state[3][2], state[3][3] = \
-        state[3][3], state[3][0], state[3][1], state[3][2]
+    state[1], state[5], state[9], state[13] = \
+        state[5], state[9], state[13], state[1]
+    state[2], state[6], state[10], state[14] = \
+        state[10], state[14], state[2], state[6]
+    state[3], state[7], state[11], state[15] = \
+        state[15], state[3], state[7], state[11]
     return state
 
 
 def InvShiftRows(state):
-    state[1][0], state[1][1], state[1][2], state[1][3] = \
-        state[1][3], state[1][0], state[1][1], state[1][2]
-    state[2][0], state[2][1], state[2][2], state[2][3] = \
-        state[2][2], state[2][3], state[2][0], state[2][1]
-    state[3][0], state[3][1], state[3][2], state[3][3] = \
-        state[3][1], state[3][2], state[3][3], state[3][0]
+    state[1], state[5], state[9], state[13] = \
+        state[13], state[1], state[5], state[9]
+    state[2], state[6], state[10], state[14] = \
+        state[10], state[14], state[2], state[6]
+    state[3], state[7], state[11], state[15] = \
+        state[7], state[11], state[15], state[3]
     return state
 
 
 def MixColumns(state):
-    result = [[0 for i in range(4)] for j in range(4)]
+    result = bytearray(16)
     for i in range(4):
-        result[0][i] = GF_MULTI[state[0][i]][2] ^ GF_MULTI[state[1][i]][3] ^ \
-                       state[2][i] ^ state[3][i]
-        result[1][i] = GF_MULTI[state[1][i]][2] ^ GF_MULTI[state[2][i]][3] ^ \
-                       state[0][i] ^ state[3][i]
-        result[2][i] = GF_MULTI[state[2][i]][2] ^ GF_MULTI[state[3][i]][3] ^ \
-                       state[0][i] ^ state[1][i]
-        result[3][i] = GF_MULTI[state[3][i]][2] ^ GF_MULTI[state[0][i]][3] ^ \
-                       state[1][i] ^ state[2][i]
+        result[4 * i] = GF_MULTI[state[4 * i]][2] ^ GF_MULTI[state[1 + 4 * i]][3] ^ \
+                        state[2 + 4 * i] ^ state[3 + 4 * i]
+        result[1 + 4 * i] = GF_MULTI[state[1 + 4 * i]][2] ^ GF_MULTI[state[2 + 4 * i]][3] ^ \
+                            state[4 * i] ^ state[3 + 4 * i]
+        result[2 + 4 * i] = GF_MULTI[state[2 + 4 * i]][2] ^ GF_MULTI[state[3 + 4 * i]][3] ^ \
+                            state[4 * i] ^ state[1 + 4 * i]
+        result[3 + 4 * i] = GF_MULTI[state[3 + 4 * i]][2] ^ GF_MULTI[state[4 * i]][3] ^ \
+                            state[1 + 4 * i] ^ state[2 + 4 * i]
     return result
 
 
 def InvMixColumns(state):
-    result = [[0 for i in range(4)] for j in range(4)]
+    result = bytearray(16)
     for i in range(4):
-        result[0][i] = GF_MULTI[state[0][i]][14] ^ GF_MULTI[state[1][i]][11] ^ \
-                       GF_MULTI[state[2][i]][13] ^ GF_MULTI[state[3][i]][9]
-        result[1][i] = GF_MULTI[state[0][i]][9] ^ GF_MULTI[state[1][i]][14] ^ \
-                       GF_MULTI[state[2][i]][11] ^ GF_MULTI[state[3][i]][13]
-        result[2][i] = GF_MULTI[state[0][i]][13] ^ GF_MULTI[state[1][i]][9] ^ \
-                       GF_MULTI[state[2][i]][14] ^ GF_MULTI[state[3][i]][11]
-        result[3][i] = GF_MULTI[state[0][i]][11] ^ GF_MULTI[state[1][i]][13] ^ \
-                       GF_MULTI[state[2][i]][9] ^ GF_MULTI[state[3][i]][14]
+        result[4 * i] = GF_MULTI[state[4 * i]][14] ^ GF_MULTI[state[1 + 4 * i]][11] ^ \
+                        GF_MULTI[state[2 + 4 * i]][13] ^ GF_MULTI[state[3 + 4 * i]][9]
+        result[1 + 4 * i] = GF_MULTI[state[4 * i]][9] ^ GF_MULTI[state[1 + 4 * i]][14] ^ \
+                            GF_MULTI[state[2 + 4 * i]][11] ^ GF_MULTI[state[3 + 4 * i]][13]
+        result[2 + 4 * i] = GF_MULTI[state[4 * i]][13] ^ GF_MULTI[state[1 + 4 * i]][9] ^ \
+                            GF_MULTI[state[2 + 4 * i]][14] ^ GF_MULTI[state[3 + 4 * i]][11]
+        result[3 + 4 * i] = GF_MULTI[state[4 * i]][11] ^ GF_MULTI[state[1 + 4 * i]][13] ^ \
+                            GF_MULTI[state[2 + 4 * i]][9] ^ GF_MULTI[state[3 + 4 * i]][14]
     return result
 
 
 def AddRoundKey(state, Roundkey):
-    for i in range(4):
-        for j in range(Nb):
-            state[i][j] ^= Roundkey[i][j]
+    for i in range(16):
+        state[i] ^= Roundkey[i]
     return state
 
 
 def InvAddRoundKey(state, Roundkey):
     Roundkey = InvMixColumns(Roundkey)
-    for i in range(4):
-        for j in range(Nb):
-            state[i][j] ^= Roundkey[i][j]
+    for i in range(16):
+        state[i] ^= Roundkey[i]
     return state
 
 
 def SubBytes(state):
-    for i in range(4):
-        for j in range(Nb):
-            x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
-            state[i][j] = S_BOX[x][y]
+    for i in range(16):
+        x, y = state[i] >> 4, state[i] & int("0xf", 16)
+        state[i] = S_BOX[x][y]
     return state
 
 
 def InvSubBytes(state):
-    for i in range(4):
-        for j in range(Nb):
-            x, y = state[i][j] >> 4, state[i][j] & int("0xf", 16)
-            state[i][j] = S_BOX_I[x][y]
+    for i in range(16):
+        x, y = state[i] >> 4, state[i] & int("0xf", 16)
+        state[i] = S_BOX_I[x][y]
     return state
 
 
@@ -418,29 +414,19 @@ def RotWord(w):
 
 
 def Key_Sub(w):
-    w_byte = []
-    for i in range(4):
-        w_byte.append((w >> ((3 - i) * 8)) & int("0xff", 16))
-    w_sub = 0
+    w_byte = bytearray(w.to_bytes(4, 'big'))
     for i in range(4):
         x, y = w_byte[i] >> 4, w_byte[i] & int("0xf", 16)
         w_byte[i] = S_BOX[x][y]
-        w_sub <<= 8
-        w_sub += w_byte[i]
-    return w_sub
+    return int.from_bytes(w_byte, 'big')
 
 
 def KeyExpansion(key, mode):
-    Nk = NkJudge(key)
-    if Nk == 0:
-        return -1
-    Nr = NrComputer(Nk)
-    key_word_list, word_num = [0 for i in range(Nk)], Nb * (Nr + 1)
-    for i in range(Nk):
-        key_word_list[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
+    Nk, Nr = NkJudge(key)
+    word_num = Nb * (Nr + 1)
     w = [0 for i in range(word_num)]
     for i in range(Nk):
-        w[i] = key_word_list[i]
+        w[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
     for i in range(Nk, word_num):
         temp = w[i - 1]
         if i % Nk == 0:
@@ -448,14 +434,11 @@ def KeyExpansion(key, mode):
         elif (Nk > 6) and (i % Nk == 4):
             temp = Key_Sub(temp)
         w[i] = temp ^ w[i - Nk]
-    key_array = [[[0 for k in range(4)] for i in range(4)] for j in range(Nr + 1)]
+    # put w into byte-matrix
+    key_array = [bytearray(16) for j in range(Nr + 1)]
     for i in range(Nr + 1):
-        temp = []
-        for j in range(4):
-            temp.append(w[i * 4 + j].to_bytes(4, 'big'))
-        for j in range(4):
-            for k in range(4):
-                key_array[i][j][k] = temp[k][j]
+        key_array[i] = w[4 * i].to_bytes(4, 'big') + w[1 + 4 * i].to_bytes(4, 'big') + \
+                       w[2 + 4 * i].to_bytes(4, 'big') + w[3 + 4 * i].to_bytes(4, 'big')
     if mode == 2:
         key_array.reverse()
     return key_array
@@ -472,28 +455,14 @@ def NkJudge(key):
     else:
         print("keylen > 256")
         return 0
-    return Nk
+    Nr = NrComputer(Nk)
+    return (Nk, Nr)
 
 
-def Text_to_State(s):
-    temp, matrix = s.to_bytes(16, 'big'), [[] for i in range(4)]
-    for i in range(16):
-        matrix[i % 4].append(temp[i])
-    return matrix
-
-
-def State_to_Text(state):
-    result = 0
-    for i in range(4):
-        for j in range(4):
-            result <<= 8
-            result += state[j][i]
-    return result
-
-
-def encrypt(s, key_list):
-    Nr = len(key_list) - 1
-    state = Text_to_State(s)
+def encrypt(s, key):
+    Nk, Nr = NkJudge(key)
+    state = bytearray(s.to_bytes(16, 'big'))
+    key_list = KeyExpansion(key, 1)
     state = AddRoundKey(state, key_list[0])
     for i in range(1, Nr):
         state = SubBytes(state)
@@ -503,13 +472,13 @@ def encrypt(s, key_list):
     state = SubBytes(state)
     state = ShiftRows(state)
     state = AddRoundKey(state, key_list[Nr])
-    result = State_to_Text(state)
-    return result
+    return state
 
 
-def decrypt(s, key_list):
-    Nr = len(key_list) - 1
-    state = Text_to_State(s)
+def decrypt(s, key):
+    Nk, Nr = NkJudge(key)
+    state = bytearray(s.to_bytes(16, 'big'))
+    key_list = KeyExpansion(key, 2)
     state = AddRoundKey(state, key_list[0])
     for i in range(1, Nr):
         state = InvSubBytes(state)
@@ -519,26 +488,26 @@ def decrypt(s, key_list):
     state = InvSubBytes(state)
     state = InvShiftRows(state)
     state = AddRoundKey(state, key_list[Nr])
-    result = State_to_Text(state)
-    return result
+    return state
 
 
 if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
     p = int(input("text= "), 16)
     k = int(input("key= "), 16)
-    c, start, end = 0, 0, 0
+    c, start, end = "", 0, 0
     if mode == 1:
-        keylist = KeyExpansion(k, mode)
         start = time.perf_counter()
-        for i in range(1000):
-            c = encrypt(p, keylist)
+        for i in range(10000):
+            state = encrypt(p, k)
         end = time.perf_counter()
     else:
-        keylist = KeyExpansion(k, mode)
         start = time.perf_counter()
-        for i in range(1000):
-            c = decrypt(p, keylist)
+        for i in range(10000):
+            state = decrypt(p, k)
         end = time.perf_counter()
-    print("\n>>>result: " + hex(c))
-    print("AES took time: {} s".format((end - start)))
+    result = ""
+    for i in range(16):
+        result += hex(state[i]).replace("0x", "").zfill(2)
+    print("\n>>>result: " + result)
+    print("\nAES took time: {} s".format((end - start)))
