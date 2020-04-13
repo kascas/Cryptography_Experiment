@@ -122,5 +122,5 @@ class AES():
 
 if __name__ == "__main__":
     obj = AES(0x0123456789abcdeffedcba9876543210, 'CBC', 0)
-    print(obj.file_encrypt("a.png", "out"))
-    print(obj.file_decrypt("out.png", "new"))
+    print(obj.file_encrypt("a.txt", "out"))
+    print(obj.file_decrypt("out.txt", "new"))
