@@ -72,7 +72,6 @@ class AES():
             result = self.ECB_decrypt(filepath)
         elif self.mode == 2:
             result = self.CBC_decrypt(filepath)
-        print(result)
         '''
         elif self.mode == 3:
             result = self.OFB_decrypt(filepath)
@@ -121,6 +120,13 @@ class AES():
 
 
 if __name__ == "__main__":
-    obj = AES(0x0123456789abcdeffedcba9876543210, 'CBC', 0)
-    print(obj.file_encrypt("a.txt", "out"))
-    print(obj.file_decrypt("out.txt", "new"))
+    obj = AES(0x0123456789abcdeffedcba9876543210, 'ECB', 0)
+    start = time.perf_counter()
+    obj.file_encrypt("a.png", "out")
+    end = time.perf_counter()
+    size = os.path.getsize("a.png")
+    print("encrypt average speed: {:.5f} KB/s".format(size / (end - start) / 1000))
+    start = time.perf_counter()
+    obj.file_decrypt("out.png", "new")
+    end = time.perf_counter()
+    print("decrypt average speed: {:.5f} KB/s".format(size / (end - start) / 1000))
