@@ -32,7 +32,7 @@ class AES():
 
     def file_to_group(self, filepath):
         with open(filepath, "rb") as fp:
-            content, content_array = open(filepath, "rb").read(), []
+            content, content_array = fp.read(), []
         for i in range(len(content) // 16):
             content_array.append(content[i * 16:i * 16 + 16])
         return content_array
@@ -46,6 +46,13 @@ class AES():
             result += (s[i] ^ k[i]).to_bytes(1, 'big')
         return result
 
+    def OFB_KeyGenerator(self, length):
+        register, s_out, keylist = bytearray(self.IV), b'', []
+        for i in range(length):
+            keylist.append(encrypt(register[:], self.key)[0])
+            register = (register + keylist[i].to_bytes(1, 'big'))[1:]
+        return keylist
+
     def file_encrypt(self, filepath, output="new"):
         result, extension_name = b'', os.path.splitext(filepath)[1]
         output += extension_name
@@ -53,9 +60,9 @@ class AES():
             result = self.ECB_encrypt(filepath)
         elif self.mode == 2:
             result = self.CBC_encrypt(filepath)
-        '''
         elif self.mode == 3:
             result = self.OFB_encrypt(filepath)
+        '''
         elif self.mode == 4:
             result = self.CFB_encrypt(filepath)
         elif self.mode == 5:
@@ -72,9 +79,9 @@ class AES():
             result = self.ECB_decrypt(filepath)
         elif self.mode == 2:
             result = self.CBC_decrypt(filepath)
-        '''
         elif self.mode == 3:
             result = self.OFB_decrypt(filepath)
+        '''
         elif self.mode == 4:
             result = self.CFB_decrypt(filepath)
         elif self.mode == 5:
@@ -118,15 +125,37 @@ class AES():
             result_bytes += self.bytearray_xor(tmp, content_list[i - 1])
         return result_bytes
 
+    def OFB_encrypt(self, filepath):
+        register, result_bytes = bytearray(16), b''
+        with open(filepath, "rb") as fp:
+            content = fp.read()
+        keylist = self.OFB_KeyGenerator(len(content))
+        for i in range(len(content)):
+            result_bytes += (keylist[i] ^ content[i]).to_bytes(1, 'big')
+        return result_bytes
+
+    def OFB_decrypt(self,filepath):
+        register, result_bytes = bytearray(16), b''
+        with open(filepath, "rb") as fp:
+            content = fp.read()
+        keylist = self.OFB_KeyGenerator(len(content))
+        for i in range(len(content)):
+            result_bytes += (keylist[i] ^ content[i]).to_bytes(1, 'big')
+        return result_bytes
+
 
 if __name__ == "__main__":
-    obj = AES(0x0123456789abcdeffedcba9876543210, 'ECB', 0)
+    obj = AES(0x0123456789abcdeffedcba9876543210, 'CBC', 0)
+
     start = time.perf_counter()
-    obj.file_encrypt("a.png", "out")
+    obj.file_encrypt("b.png", "out")
     end = time.perf_counter()
-    size = os.path.getsize("a.png")
+    size = os.path.getsize("b.png")
     print("encrypt average speed: {:.5f} KB/s".format(size / (end - start) / 1000))
     start = time.perf_counter()
     obj.file_decrypt("out.png", "new")
     end = time.perf_counter()
     print("decrypt average speed: {:.5f} KB/s".format(size / (end - start) / 1000))
+
+    os.system("pause")
+
