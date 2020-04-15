@@ -431,6 +431,8 @@ def KeyExpansion(key, mode):
                        w[2 + 4 * i].to_bytes(4, 'big') + w[3 + 4 * i].to_bytes(4, 'big')
     if mode == 2:
         key_array.reverse()
+    for i in range(word_num):
+        print(w[i])
     return key_array
 
 
@@ -477,3 +479,18 @@ def decrypt(state, key):
     state = InvShiftRows(state)
     state = AddRoundKey(state, key_list[Nr])
     return state
+
+
+if __name__ == "__main__":
+    mode = int(input("mode: [1]crypt, [2]decrypt  "))
+    p = bytearray(int(input("text= "), 16).to_bytes(16, 'big'))
+    k = int(input("key= "), 16)
+    c = encrypt(p, k)
+    print(">>>result: ", end="")
+    for i in range(16):
+        print(hex(c[i]).replace("0x", ""), end="")
+
+    # print("\n\nTest encrypt and decrypt: ")
+    # print("encrypt: {}".format(hex(encrypt(p,k))))
+    # print("decrypt: {}".format(hex(decrypt(p, k))))
+    os.system("pause")
