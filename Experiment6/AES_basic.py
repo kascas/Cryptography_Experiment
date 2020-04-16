@@ -431,8 +431,10 @@ def KeyExpansion(key, mode):
                        w[2 + 4 * i].to_bytes(4, 'big') + w[3 + 4 * i].to_bytes(4, 'big')
     if mode == 2:
         key_array.reverse()
+    '''
     for i in range(word_num):
         print(w[i])
+    '''
     return key_array
 
 
