@@ -314,8 +314,7 @@ GF_MULTI = [
     [0x00, 0xff, 0xe5, 0x1a, 0xd1, 0x2e, 0x34, 0xcb, 0xb9, 0x46, 0x5c, 0xa3, 0x68, 0x97, 0x8d, 0x72]
 ]
 
-
-Nk,Nr=4,10;
+Nk, Nr = 4, 10
 
 
 def ShiftRows(state):
@@ -463,14 +462,14 @@ if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
     p = bytearray(int(input("text= "), 16).to_bytes(16, 'big'))
     k = int(input("key= "), 16)
-    start=time.perf_counter()
+    start = time.perf_counter()
     if mode == 1:
         c = encrypt(p, k)
     else:
         c = decrypt(p, k)
-    end=time.perf_counter()
+    end = time.perf_counter()
     print(">>>result: ", end="")
     for i in range(16):
         print(hex(c[i]).replace("0x", ""), end="")
-    print("\ntime: {}\n".format(end-start))
+    print("\ntime: {}\n".format(end - start))
     os.system("pause")
