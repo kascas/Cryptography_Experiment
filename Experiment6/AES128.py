@@ -315,13 +315,7 @@ GF_MULTI = [
 ]
 
 
-def NrComputer(Nk):
-    if Nk == 4:
-        return 10
-    if Nk == 6:
-        return 12
-    if Nk == 8:
-        return 14
+Nk,Nr=4,10;
 
 
 def ShiftRows(state):
@@ -387,36 +381,35 @@ def InvAddRoundKey(state, Roundkey):
 
 def SubBytes(state):
     for i in range(16):
-        x, y = state[i] >> 4, state[i] & int("0xf", 16)
+        x, y = state[i] >> 4, state[i] & 0xf
         state[i] = S_BOX[x][y]
     return state
 
 
 def InvSubBytes(state):
     for i in range(16):
-        x, y = state[i] >> 4, state[i] & int("0xf", 16)
+        x, y = state[i] >> 4, state[i] & 0xf
         state[i] = S_BOX_I[x][y]
     return state
 
 
 def RotWord(w):
-    return ((w << 8) & int("0xffffffff", 16)) + (w >> 24)
+    return ((w << 8) & 0xffffffff) + (w >> 24)
 
 
 def Key_Sub(w):
     w_byte = bytearray(w.to_bytes(4, 'big'))
     for i in range(4):
-        x, y = w_byte[i] >> 4, w_byte[i] & int("0xf", 16)
+        x, y = w_byte[i] >> 4, w_byte[i] & 0xf
         w_byte[i] = S_BOX[x][y]
     return int.from_bytes(w_byte, 'big')
 
 
 def KeyExpansion(key, mode):
-    Nk, Nr = NkJudge(key)
     word_num = Nb * (Nr + 1)
     w = [0 for i in range(word_num)]
     for i in range(Nk):
-        w[i] = (key >> ((Nk - 1 - i) * 32)) & int("0xffffffff", 16)
+        w[i] = (key >> ((Nk - 1 - i) * 32)) & 0xffffffff
     for i in range(Nk, word_num):
         temp = w[i - 1]
         if i % Nk == 0:
@@ -438,23 +431,7 @@ def KeyExpansion(key, mode):
     return key_array
 
 
-def NkJudge(key):
-    Nk = 0
-    if len(hex(key).replace("0x", "")) <= 32:
-        Nk = 4
-    elif len(hex(key).replace("0x", "")) <= 48:
-        Nk = 6
-    elif len(hex(key).replace("0x", "")) <= 64:
-        Nk = 8
-    else:
-        print("keylen > 256")
-        return 0
-    Nr = NrComputer(Nk)
-    return (Nk, Nr)
-
-
 def encrypt(state, key):
-    Nk, Nr = NkJudge(key)
     key_list = KeyExpansion(key, 1)
     state = AddRoundKey(state, key_list[0])
     for i in range(1, Nr):
@@ -469,7 +446,6 @@ def encrypt(state, key):
 
 
 def decrypt(state, key):
-    Nk, Nr = NkJudge(key)
     key_list = KeyExpansion(key, 2)
     state = AddRoundKey(state, key_list[0])
     for i in range(1, Nr):
@@ -487,12 +463,14 @@ if __name__ == "__main__":
     mode = int(input("mode: [1]crypt, [2]decrypt  "))
     p = bytearray(int(input("text= "), 16).to_bytes(16, 'big'))
     k = int(input("key= "), 16)
-    c = encrypt(p, k)
+    start=time.perf_counter()
+    if mode == 1:
+        c = encrypt(p, k)
+    else:
+        c = decrypt(p, k)
+    end=time.perf_counter()
     print(">>>result: ", end="")
     for i in range(16):
         print(hex(c[i]).replace("0x", ""), end="")
-
-    # print("\n\nTest encrypt and decrypt: ")
-    # print("encrypt: {}".format(hex(encrypt(p,k))))
-    # print("decrypt: {}".format(hex(decrypt(p, k))))
+    print("\ntime: {}\n".format(end-start))
     os.system("pause")
