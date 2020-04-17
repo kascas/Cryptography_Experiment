@@ -463,10 +463,11 @@ if __name__ == "__main__":
     p = bytearray(int(input("text= "), 16).to_bytes(16, 'big'))
     k = int(input("key= "), 16)
     start = time.perf_counter()
-    if mode == 1:
-        c = encrypt(p, k)
-    else:
-        c = decrypt(p, k)
+    for i in range(10000):
+        if mode == 1:
+            c = encrypt(p, k)
+        else:
+            c = decrypt(p, k)
     end = time.perf_counter()
     print(">>>result: ", end="")
     for i in range(16):
