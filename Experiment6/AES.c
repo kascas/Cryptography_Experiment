@@ -233,11 +233,12 @@ void AES_CFB_decrypt(char *src, char *dest, uint8 *key, uint8 *IV)
         for (i = 0; i < 16; i++)
             x[i] = reg[i];
         encrypt(x, key);
+        uint8 tmp = buffer[0];
         buffer[0] ^= x[0];
         fwrite(buffer, 1, 1, f_write);
         for (i = 0; i < 16; i++)
             reg[i] = reg[i + 1];
-        reg[15] = buffer[0];
+        reg[15] = tmp;
     }
     fclose(fp);
     fclose(f_write);
