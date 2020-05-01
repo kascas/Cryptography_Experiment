@@ -2,6 +2,7 @@ import secrets
 import hashlib
 import random
 import math
+import os
 from Math import *
 
 
@@ -190,3 +191,4 @@ if __name__ == "__main__":
     print(C)
     M = RSAES_OAEP_D(n, d, C, b'')
     print(M)
+    os.system("pause")
