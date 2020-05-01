@@ -1,3 +1,6 @@
+import random
+
+
 def FastExp(x, n, m):
     d = 1
     # if n%2==1,compute (d*x)%m,else only do (x*x)%m
@@ -42,8 +45,36 @@ def CRT(b, m, n):
     return result
 
 
+def MR_test(p):
+    # p_1 is p-1, initialize variables
+    q = p - 1
+    k, isprime = 0, 0
+    # compute k,q s.t. p-1=q*(2^k)
+    while q & 1 == 0:
+        q >>= 1
+        k += 1
+    # compute r^q mod p
+    for i in range(10):
+        isprime = 0
+        r = random.randint(2, p - 1)
+        r_q = FastExp(r, q, p)
+        if (r_q == 1):
+            isprime += 1
+        else:
+            for j in range(k):
+                r_q = FastExp(r, (1 << j) * q, p)
+                if (r_q == p - 1):
+                    isprime += 1
+            if isprime == 0:
+                return 0
+    return 1
+
+
 if __name__ == "__main__":
-    a = int(input("a: "))
-    b = int(input("b: "))
-    g, s, t = GCD(a, b)
-    print(g, s, t)
+    count = 0
+    for i in range(3, 400):
+        if (MR_test(i) == 1):
+            count += 1
+            print(i, end=" ")
+    print()
+    print(count)
