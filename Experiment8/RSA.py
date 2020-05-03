@@ -64,7 +64,7 @@ def RSAVP1(s, n, e):
         print("RSASP1 overflow")
         return -1
     m = FastExp(s, e, n)
-    return s
+    return m
 
 
 def RSAEP(p, n, e):
