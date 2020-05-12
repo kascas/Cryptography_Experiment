@@ -1,3 +1,6 @@
+import random
+
+
 def CRT(b, m, n):
     # initialize variables
     mm, bm, bmp, result = 1, 0, 0, 0
@@ -79,3 +82,36 @@ def root(n, e):
         else:
             return mid
     return -1
+
+
+def MR_test(p):
+    q, k = p - 1, 0
+    # compute k,q s.t. p-1=q*(2^k)
+    while q & 1 == 0:
+        q >>= 1
+        k += 1
+    # compute r^q mod p
+    for i in range(10):
+        j = 0
+        r = random.randint(2, p - 1)
+        r_q = FastExp(r, q, p)
+        if (r_q == 1) or (r_q == p - 1):
+            continue
+        while j < k:
+            r_q = FastExp(r_q, 2, p)
+            if r_q == p - 1:
+                break
+            j += 1
+        if j == k and r_q != p - 1:
+            return 0
+    return 1
+
+
+if __name__ == "__main__":
+    count = 1
+    for i in range(3, 1000000):
+        if MR_test(i) == 1:
+            #print(i, end=" ")
+            count += 1
+    print()
+    print(count)

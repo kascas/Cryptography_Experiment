@@ -3,7 +3,7 @@ import hashlib
 import random
 import math
 import os
-from Math import *
+from Numtheory import *
 
 
 def prime_generator(bitlen):
