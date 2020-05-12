@@ -1,4 +1,5 @@
 import os
+from Numtheory import *
 
 
 def phi_n(e, d, n):
@@ -39,29 +40,10 @@ def factor(e, d, n):
         p_q_plus = n - pn_list[i] + 1
         p_q_square_plus = p_q_plus ** 2
         p_q_square_minus = p_q_square_plus - 4 * n
-        p_q_minus = sqrt(p_q_square_minus)
+        p_q_minus = root(p_q_square_minus, 2)
         p, q = (p_q_plus + p_q_minus) // 2, (p_q_plus - p_q_minus) // 2
         result.append((p, q))
     return result
-
-
-def sqrt(n):
-    '''
-    use BinarySearch to find the root
-    :param n: n
-    :return: sqrt(n)
-    '''
-    low = 1
-    height = n
-    while low < height:
-        mid = (low + height) // 2
-        if mid ** 2 < n:
-            low = mid + 1
-        elif mid ** 2 > n:
-            height = mid - 1
-        else:
-            return mid
-    return -1
 
 
 if __name__ == "__main__":

@@ -1,59 +1,11 @@
 import os
-from Math import *
-
-
-def GCD(a, b):
-    '''
-    use this GCD because recursive function stack-overflow
-    :param a:
-    :param b:
-    :return:
-    '''
-    # initialize x1,y1,x2,y2
-    x1, y1, x2, y2 = 1, 0, 0, 1
-    tmpa, tmpb = a, b
-    # t1,t2 are temporary variables
-    t1, t2 = 0, 0
-    L = []
-    while (1):
-        # copy t1,t2 from x2,y2
-        t1, t2 = x2, y2
-        # recursion equations
-        x2, y2 = x1 - (a // b) * x2, y1 - (a // b) * y2
-        # exchange values
-        x1, y1 = t1, t2
-        if (a % b) == 0:
-            break
-        # exchange values
-        a, b = b, a % b
-    # if b is negative,make it positive
-    if b < 0:
-        b, x1, y1 = (-1) * b, (-1) * x1, (-1) * y1
-
-    while (x1 <= 0):
-        x1 += tmpb
-        y1 -= tmpa
-
-    L = [b, x1, y1]
-    return L
+from Numtheory import *
 
 
 def attack(c, e, n):
     g, s1, s2 = GCD(e[0], e[1])
-    c1_s1, c2_s2 = 0, 0
-    if s1 < 0:
-        s1 *= -1
-        tmp = FastExp(c[0], s1, n)
-        c1_s1 = GCD(tmp, n)[1]
-        print(c1_s1)
-    else:
-        c1_s1 = FastExp(c[0], s1, n)
-    if s2 < 0:
-        s2 *= -1
-        tmp = FastExp(c[1], s2, n)
-        c2_s2 = GCD(tmp, n)[1]
-    else:
-        c2_s2 = FastExp(c[1], s2, n)
+    c1_s1 = FastExp(c[0], s1, n)
+    c2_s2 = FastExp(c[1], s2, n)
     m = (c1_s1 * c2_s2) % n
     return m
 
@@ -67,4 +19,4 @@ if __name__ == "__main__":
     ]
     result = attack(c, e, n)
     print(result)
-    print(FastExp(result, e[0], n))
+    print(FastExp(result, e[1], n))

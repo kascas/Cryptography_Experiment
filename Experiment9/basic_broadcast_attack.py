@@ -1,5 +1,5 @@
 import os
-from Math import *
+from Numtheory import *
 
 
 def attack(c, e, n):
@@ -7,20 +7,6 @@ def attack(c, e, n):
     print(m_exp)
     result = root(m_exp, e)
     return result
-
-
-def root(n, e):
-    low = 1
-    height = n
-    while low < height:
-        mid = (low + height) // 2
-        if mid ** e < n:
-            low = mid + 1
-        elif mid ** e > n:
-            height = mid - 1
-        else:
-            return mid
-    return -1
 
 
 if __name__ == "__main__":
