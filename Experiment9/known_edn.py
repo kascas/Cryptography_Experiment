@@ -51,10 +51,10 @@ def sqrt(n):
     :param n: n
     :return: sqrt(n)
     '''
-    low = 0
-    height = n - 1
+    low = 1
+    height = n
     while low < height:
-        mid = (low + height) // 2 + 1
+        mid = (low + height) // 2
         if mid ** 2 < n:
             low = mid + 1
         elif mid ** 2 > n:
