@@ -20,3 +20,4 @@ if __name__ == "__main__":
     result = attack(c, e, n)
     print(result)
     print(FastExp(result, e[1], n))
+    os.system("pause")

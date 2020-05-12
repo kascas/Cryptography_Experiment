@@ -196,10 +196,9 @@ def RSAES_OAEP_D(n, d, C, L=b''):
 
 if __name__ == "__main__":
     n, e, d = rsa_init()
-    print(n, e, d)
-    M = b'uweifsauivhssdvadsva'
+    M = input("M: ").encode('UTF-8')
     C = RSAES_OAEP_E(n, e, M, b'')
-    print(C)
+    print('encrypt: {}'.format(C))
     M = RSAES_OAEP_D(n, d, C, b'')
-    print(M)
+    print('decrypt: {}'.format(M.decode('UTF-8')))
     os.system("pause")
