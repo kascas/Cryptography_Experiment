@@ -53,5 +53,5 @@ if __name__ == "__main__":
     p, q = factor(e, d, n)[0]
     print('p: {}'.format(p))
     print('q: {}'.format(q))
-    print(p * q - n)
+    print('test(pq-n): {}'.format(p * q - n))
     os.system("pause")
