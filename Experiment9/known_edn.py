@@ -14,8 +14,7 @@ def phi_n(e, d, n):
     :return: phi_n
     '''
     mul = e * d - 1
-    base = mul // n
-    i = base
+    i = mul // n
     while mul % i != 0:
         i += 1
     return mul // i
