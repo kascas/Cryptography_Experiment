@@ -1,3 +1,6 @@
+import random
+
+
 def CRT(b, m, n):
     # initialize variables
     mm, bm, bmp, result = 1, 0, 0, 0
