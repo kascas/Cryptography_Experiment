@@ -12,7 +12,7 @@ def OS2IP(x_array):
     return x
 
 
-def init(k):
+def init(k=128):
     '''
     find safe prime's primitive root
         is much easier than general prime's
@@ -67,9 +67,11 @@ def verify(S, M, pu):
 
 
 if __name__ == "__main__":
-    pu, pr = init(128)
+    pu, pr = init()
+    print('public  key: {}'.format(pu))
+    print('private key: {}'.format(pr))
     m = input("m: ")
     M = m.encode('utf-8')
     S = sign(M, pr)
-    print(verify(S, M, pu))
+    print('verify: {}'.format(verify(S, M, pu)))
     os.system("pause")
