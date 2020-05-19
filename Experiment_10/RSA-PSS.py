@@ -178,7 +178,9 @@ def RSA_verify(pu, M, S):
 
 if __name__ == "__main__":
     pu, pr = rsa_init()
+    print("public  key: {}".format(pu))
+    print("private key: {}".format(pr))
     M = input("M: ").encode('UTF-8')
     S = RSA_sign(pr, M)
-    print(RSA_verify(pu, M, S))
+    print("verify: {}".format(RSA_verify(pu, M, S)))
     os.system("pause")
