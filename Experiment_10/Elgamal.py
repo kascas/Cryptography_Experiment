@@ -13,8 +13,27 @@ def OS2IP(x_array):
 
 
 def init(k):
-    p = prime(k)
-    g = random.randrange(2, p)
+    '''
+    find safe prime's primitive root
+        is much easier than general prime's
+    safe prime: p=2*q+1 (both p and q are primes)
+    find safe prime's primitive root:
+        (g^2 mod p !=1) and (g^q mod q !=1)
+    :param k: the bit length of p
+    :return: pu(public key) and pr(private key)
+    '''
+    # find safe prime p
+    while (1):
+        p = prime(k)
+        q = (p - 1) >> 1
+        if MR_test(q) == 1:
+            break
+    # find p's primitive root
+    while (1):
+        g = random.randrange(2, p)
+        if FastExp(g, 2, p) != 1 and FastExp(g, q, p) != 1:
+            break
+    # random x
     x = random.randrange(1, p - 1)
     y = FastExp(g, x, p)
     pu = (p, g, y)
@@ -23,9 +42,11 @@ def init(k):
 
 
 def sign(M, pr):
+    # M's hash value
     mHash = OS2IP(hashlib.sha1(M).digest())
     p, g, x = pr
     k = p - 1
+    # select k which is coprime to p-1
     while GCD(k, p - 1)[0] != 1:
         k = random.randint(1, p - 1)
     s1 = FastExp(g, k, p)
@@ -46,7 +67,7 @@ def verify(S, M, pu):
 
 
 if __name__ == "__main__":
-    pu, pr = init(1024)
+    pu, pr = init(128)
     m = input("m: ")
     M = m.encode('utf-8')
     S = sign(M, pr)
