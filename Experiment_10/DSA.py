@@ -69,8 +69,10 @@ def verify(M, r_byte, s_byte, pu):
 
 if __name__ == "__main__":
     pu, pr = init()
+    print("public  key: {}".format(pu))
+    print("private key：{}".format(pr))
     m = input("m: ")
     M = m.encode('utf-8')
     M, r_byte, s_byte = sign(M, pr)
-    print(verify(M, r_byte, s_byte, pu))
+    print('verify: {}'.format(verify(M, r_byte, s_byte, pu)))
     os.system("pause")
