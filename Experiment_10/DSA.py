@@ -23,12 +23,14 @@ def init():
         if bitlen(p) % 64 == 0:
             break
     tmp, g = 2, 0
-    # compute g=h^((p-1)/q) mod p
+    # a**q = 1 mod q
+    # as for every 'tmp', tmp**(n*q) = 1 mod p
+    # replace 'a' with 'tmp**n' to accelerate
     while (1):
+        tmp = random.randint(2, p - 1)
         g = FastExp(tmp, n, p)
         if g > 1:
             break
-        tmp += 1
     x = random.randint(1, q)
     y = FastExp(g, x, p)
     return ((p, q, g, y), (p, q, g, x))
