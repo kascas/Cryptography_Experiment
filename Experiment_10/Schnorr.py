@@ -22,12 +22,11 @@ def init():
     # a**q = 1 mod q
     # as for every 'tmp', tmp**(n*q) = 1 mod p
     # replace 'a' with 'tmp**n' to accelerate
-    tmp = 2
     while (1):
+        tmp = random.randint(2, p - 1)
         a = FastExp(tmp, n, p)
         if a > 1:
             break
-        tmp += 1
     s = random.randint(1, q)
     v = Invert(FastExp(a, s, p), p)
     pu = (p, q, a, v)
