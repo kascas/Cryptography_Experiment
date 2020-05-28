@@ -1,5 +1,6 @@
 from Numtheory import *
 from ECC_compute import *
+import os
 
 '''
 def init():
@@ -68,8 +69,10 @@ if __name__ == "__main__":
     C1, C2 = encrypt(GLOBAL, public, M)
     Mp = decrypt(GLOBAL, private, (C1, C2))
 
-    print('M: {}'.format(M))
-    print('public  key: {}'.format(public))
-    print('private key: {}'.format(private))
-    print('encrypt: {}'.format((C1, C2)))
-    print('decrypt: {}'.format(M))
+    print('M: {}\n'.format(M))
+    print('public  key: {}\n'.format(public))
+    print('private key: {}\n'.format(private))
+    print('encrypt: {}\n'.format((C1, C2)))
+    print('decrypt: {}\n'.format(M))
+
+    os.system('pause')

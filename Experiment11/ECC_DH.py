@@ -1,5 +1,6 @@
 from ECC_compute import *
 from Numtheory import *
+import os
 
 '''
 def init():
@@ -55,5 +56,9 @@ if __name__ == "__main__":
     secretA = secret(GLOBAL, Na, Pb)
     secretB = secret(GLOBAL, Nb, Pa)
 
-    print('A\'s key: {}'.format(secretA))
-    print('B\'s key: {}'.format(secretB))
+    print('A\'s key: {}\n'.format(aKey))
+    print('B\'s key: {}\n'.format(bKey))
+    print('K(created by A): {}\n'.format(secretA))
+    print('K(created by B): {}\n'.format(secretA))
+
+    os.system("pause")

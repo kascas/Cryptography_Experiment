@@ -1,6 +1,7 @@
 from Numtheory import *
 from ECC_compute import *
 import hashlib
+import os
 
 
 def KeyGen(GLOBAL):
@@ -71,5 +72,7 @@ if __name__ == "__main__":
     S = sign(M, GLOBAL, d)
     result = verify(M, GLOBAL, Q, S)
 
-    print('sign: {}'.format(S))
-    print('verify: {}'.format(result))
+    print('sign: {}\n'.format(S))
+    print('verify: {}\n'.format(result))
+
+    os.system('pause')
