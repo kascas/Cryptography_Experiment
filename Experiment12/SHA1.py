@@ -94,3 +94,5 @@ if __name__ == "__main__":
 
     print('   mine: {}'.format(h.hexdigest()))
     print('hashlib: {}'.format(hashlib.sha1(m_encode).hexdigest()))
+
+    os.system('pause')

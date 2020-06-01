@@ -1,3 +1,4 @@
+import os
 from SHA1 import *
 
 
@@ -47,3 +48,4 @@ class HMAC:
 if __name__ == "__main__":
     h = HMAC(k=(input('key: ')).encode('utf-8'), hashstr='sha1')
     print('MAC: {}'.format(h.mac(m=input('message: ').encode('utf-8'))))
+    os.system('pause')
