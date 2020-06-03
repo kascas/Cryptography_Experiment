@@ -84,6 +84,9 @@ class SHA1:
             p += hex(self.H[i])[2:].zfill(8)
         return p
 
+    def digest(self):
+        return (self.H[0] << 128) | (self.H[1] << 96) | (self.H[2] << 64) | (self.H[3] << 32) | self.H[4]
+
 
 if __name__ == "__main__":
     m = str(input('message: '))

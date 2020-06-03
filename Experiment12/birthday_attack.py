@@ -30,14 +30,15 @@ def attack(hStr, n):
         H = SHA1()
         # compute hash of the message
         H.hash(mTest)
-        mValue = int(H.hexdigest(), 16)
+        mValue = H.digest()
         # test
         if test(hValue, mValue, n):
             return mTest
 
 
 if __name__ == "__main__":
-    hStr = 'a9993e364706816aba3e25717850c26c9cd0d89d'
+    # hStr = 'a9993e364706816aba3e25717850c26c9cd0d89d'
+    hStr = input('H(x): ')
     n = int(input('n: '))
     m = attack(hStr, n)
     print('probably message: {}'.format(m))
