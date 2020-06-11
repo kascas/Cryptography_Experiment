@@ -6,7 +6,7 @@ def attack(c, e, n):
     g, s1, s2 = GCD(e[0], e[1])
     c1_s1 = FastExp(c[0], s1, n)
     c2_s2 = FastExp(c[1], s2, n)
-    m = (c1_s1 * c2_s2) % n
+    m = root((c1_s1 * c2_s2) % n, g)
     return m
 
 

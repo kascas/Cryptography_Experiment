@@ -73,6 +73,8 @@ def FastExp(x, n, m):
 def root(n, e):
     low = 1
     height = n
+    if e == 1:
+        return n
     while low < height:
         mid = (low + height) // 2
         if mid ** e < n:
@@ -111,7 +113,7 @@ if __name__ == "__main__":
     count = 1
     for i in range(3, 1000000):
         if MR_test(i) == 1:
-            #print(i, end=" ")
+            # print(i, end=" ")
             count += 1
     print()
     print(count)
