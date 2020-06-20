@@ -243,3 +243,22 @@ def srm_prime(a, p):
             r = r * c % p
         c = c * c % p
     return (r, -r)
+
+
+def root_mod(n, p):
+    x1, x2 = 0, 0
+    if p % 8 == 3 or p % 8 == 7:
+        x1 = FastExp(n, (p + 1) // 4, p)
+        x2 = (-1 * x1) % p
+    elif p % 8 == 5:
+        if FastExp(n, (p - 1) // 4, p) == 1:
+            x1 = FastExp(n, (p + 3) // 8, p)
+            x2 = (-1 * x1) % p
+        elif FastExp(n, (p - 1) // 4, p) == -1:
+            x1 = (FastExp(2, (p - 1) // 4, p) * FastExp(n, (p + 3) // 8, p)) % p
+            x2 = (-1 * x1) % p
+    else:
+        for i in range(p):
+            if (i ** 2) % p == n:
+                x1, x2 = i, (-1 * i) % p
+    return (x1, x2)
