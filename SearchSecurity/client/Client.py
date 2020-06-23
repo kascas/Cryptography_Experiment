@@ -5,8 +5,8 @@ import AESFileEncrypt as aes
 
 def login(clientSocket):
     print('>>> login')
-    name = input('... name: ')
-    pswd = input('... pswd: ')
+    name = input('... Username: ')
+    pswd = input('... Password: ')
     clientSocket.send(name.encode('utf-8'))
     clientSocket.send(pswd.encode('utf-8'))
     result = clientSocket.recv(1024).decode('utf-8')
@@ -16,7 +16,8 @@ def login(clientSocket):
         return False
 
 
-def _client_upload(clientSocket, filename):
+def _client_upload(clientSocket):
+    filename = input('... File Path: ')
     # get filename without path
     clientSocket.send(os.path.split(filename)[1].encode('utf-8'))
     # create a tmp file
@@ -35,6 +36,7 @@ def _client_upload(clientSocket, filename):
                 break
             clientSocket.send(data)
     os.remove(tmpFile)
+    print('... Upload Finish')
 
 
 def _client_search(clientSocket):
@@ -46,7 +48,7 @@ def _client_search(clientSocket):
     return
 
 
-def _client_tcp(ip, port, filename):
+def _client_tcp(ip, port):
     # login to server
     while True:
         clientSocket = socket(AF_INET, SOCK_STREAM)
@@ -65,11 +67,11 @@ def _client_tcp(ip, port, filename):
     clientSocket.send(mode.encode('utf-8'))
     # 'upload' may send a encrypted file to server
     if mode == '1':
-        _client_upload(clientSocket, filename)
+        _client_upload(clientSocket)
     else:
         _client_search(clientSocket)
     clientSocket.close()
 
 
 if __name__ == '__main__':
-    _client_tcp('127.0.0.1', 80, './File/1.pdf')
+    _client_tcp('127.0.0.1', 80)
