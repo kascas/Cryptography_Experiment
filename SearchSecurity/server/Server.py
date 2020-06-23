@@ -73,7 +73,8 @@ def _server_search(clientSocket, foldername):
                 count += 1
         if count == len(wordList):
             resultList.append(i.split('.')[0])
-        BF._bloom_free(call)
+        BF._bloom_delete(call)
+        print(bfname)
     clientSocket.send(str(len(resultList)).encode('utf-8'))
     for i in resultList:
         clientSocket.send(i.encode('utf-8'))
@@ -120,6 +121,8 @@ def _server_tcp():
                 '''
         except ConnectionResetError:
             print('... client\'s connection fails')
+        except Exception as r:
+            print('error: %s' % r)
         clientSocket.close()
         print('... connection break')
     serverSocket.close()

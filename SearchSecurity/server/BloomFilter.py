@@ -36,6 +36,10 @@ def _bloom_free(call):
     call.bloom_free()
     return
 
+def _bloom_delete(call):
+    call.bloom_delete()
+    return
+
 
 if __name__ == "__main__":
     call = cdll.LoadLibrary('./bloom.dll')

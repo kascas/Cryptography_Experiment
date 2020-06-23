@@ -21,7 +21,6 @@ def _stat_word(call, filename):
     for i in range(len(result)):
         BF._bloom_add(call, result[i])
     BF._bloom_write(call, './bloom.bf'.encode('utf-8'))
-    BF._bloom_free(call)
     return
 
 

@@ -180,6 +180,15 @@ int bloom_reset()
   return 0;
 }
 
+void bloom_delete()
+{
+    free(bloom->bf);
+    bloom->bf=NULL;
+    free(bloom);
+    bloom=NULL;
+    return;
+}
+
 void bloom_write(char *filename)
 {
   int i = 0;
@@ -195,6 +204,7 @@ void bloom_write(char *filename)
   fprintf(fp, "\n");
   fprintf(fp, "%d\n", bloom->ready);
   fclose(fp);
+  bloom_delete();
   return;
 }
 
