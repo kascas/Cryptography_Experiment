@@ -1,6 +1,8 @@
 from socket import *
 import os.path
 import AESFileEncrypt as aes
+import WordStat as ws
+from ctypes import *
 
 
 def login(clientSocket):
@@ -19,8 +21,8 @@ def login(clientSocket):
 def _client_upload(clientSocket):
     filename = input('... File Path: ')
     # get filename without path
-    clientSocket.send(os.path.split(filename)[1].encode('utf-8'))
-    # create a tmp file
+    tmp = os.path.split(filename)[1]
+    # create a tmp file for encryption
     tmpFile = os.path.split(filename)[0] + '/tmp' + os.path.splitext(filename)[1]
     # get key and iv from PRIVATE.key
     with open('./PRIVATE.key', 'r') as fp:
@@ -29,13 +31,27 @@ def _client_upload(clientSocket):
     # file encrypt
     aes._file_encrypt(filename, tmpFile, key, iv)
     # send encrypted file
+    clientSocket.send(tmp.encode('utf-8'))
+    clientSocket.send(hex(os.path.getsize(tmpFile)).encode('utf-8'))
     with open(tmpFile, 'rb') as fp:
         while True:
             data = fp.read(1024)
-            if len(data) == 0:
+            if not data:
                 break
             clientSocket.send(data)
     os.remove(tmpFile)
+    # send bloom file
+    call = cdll.LoadLibrary('./bloom.dll')
+    ws._stat_word(call, filename)
+    clientSocket.send((tmp.split('.')[0] + '.bf').encode('utf-8'))
+    clientSocket.send(hex(os.path.getsize('./bloom.bf')).encode('utf-8'))
+    with open('./bloom.bf', 'rb') as fp:
+        while True:
+            data = fp.read(1024)
+            if not data:
+                break
+            clientSocket.send(data)
+    os.remove('./bloom.bf')
     print('... Upload Finish')
 
 

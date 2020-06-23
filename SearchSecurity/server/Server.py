@@ -22,14 +22,34 @@ def loginVerify(clientSocket):
 
 def _server_receive(foldername, clientSocket):
     filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
-    print('... upload file: ', filename)
+    filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    print('... upload file: %s    size: %s' % (filename, filesize))
+    count = 0
     with open(filename, 'wb') as fp:
         while True:
             data = clientSocket.recv(1024)
-            if len(data) == 0:
-                break
             fp.write(data)
+            count += len(data)
+            if count == filesize:
+                break
+    filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
+    filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    count = 0
+    print('... upload file: %s    size: %s' % (filename, filesize))
+    with open(filename, 'wb') as fp:
+        while True:
+            data = clientSocket.recv(1024)
+            fp.write(data)
+            count += len(data)
+            if count == filesize:
+                break
     return
+
+
+def _server_search(foldername, wordList):
+    for a, b, c in os.walk(foldername):
+        for i in c:
+            print(i)
 
 
 def _server_tcp():
