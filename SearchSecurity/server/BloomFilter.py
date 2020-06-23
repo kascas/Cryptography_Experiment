@@ -32,6 +32,10 @@ def _bloom_write(call, filename):
     call.bloom_write(filename)
     return
 
+def _bloom_free(call):
+    call.bloom_free()
+    return
+
 
 if __name__ == "__main__":
     call = cdll.LoadLibrary('./bloom.dll')

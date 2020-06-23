@@ -201,6 +201,7 @@ void bloom_write(char *filename)
 void bloom_read(char *filename)
 {
   int i = 0;
+  bloom = (struct bloom *)malloc(sizeof(struct bloom));
   FILE *fp = fopen(filename, "r");
   fscanf(fp, "%d", &bloom->entries);
   fscanf(fp, "%lf", &bloom->error);
@@ -208,12 +209,14 @@ void bloom_read(char *filename)
   fscanf(fp, "%d", &bloom->bytes);
   fscanf(fp, "%d", &bloom->hashes);
   fscanf(fp, "%lf", &bloom->bpe);
+  bloom->bf = (unsigned char *)calloc(bloom->bytes, sizeof(unsigned char));
   for (i = 0; i < bloom->bytes; i++)
     fscanf(fp, "%d", &bloom->bf[i]);
   fscanf(fp, "%d", &bloom->ready);
   fclose(fp);
   return;
 }
+
 /*
 int main()
 {

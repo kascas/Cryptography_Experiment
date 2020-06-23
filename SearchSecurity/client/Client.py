@@ -19,48 +19,59 @@ def login(clientSocket):
 
 
 def _client_upload(clientSocket):
-    filename = input('... File Path: ')
-    # get filename without path
-    tmp = os.path.split(filename)[1]
-    # create a tmp file for encryption
-    tmpFile = os.path.split(filename)[0] + '/tmp' + os.path.splitext(filename)[1]
-    # get key and iv from PRIVATE.key
-    with open('./PRIVATE.key', 'r') as fp:
-        key = fp.readline().encode('utf-8')
-        iv = fp.readline().encode('utf-8')
-    # file encrypt
-    aes._file_encrypt(filename, tmpFile, key, iv)
-    # send encrypted file
-    clientSocket.send(tmp.encode('utf-8'))
-    clientSocket.send(hex(os.path.getsize(tmpFile)).encode('utf-8'))
-    with open(tmpFile, 'rb') as fp:
-        while True:
-            data = fp.read(1024)
-            if not data:
-                break
-            clientSocket.send(data)
-    os.remove(tmpFile)
-    # send bloom file
-    call = cdll.LoadLibrary('./bloom.dll')
-    ws._stat_word(call, filename)
-    clientSocket.send((tmp.split('.')[0] + '.bf').encode('utf-8'))
-    clientSocket.send(hex(os.path.getsize('./bloom.bf')).encode('utf-8'))
-    with open('./bloom.bf', 'rb') as fp:
-        while True:
-            data = fp.read(1024)
-            if not data:
-                break
-            clientSocket.send(data)
-    os.remove('./bloom.bf')
-    print('... Upload Finish')
+    # filename = input('... File Path: ')
+    fileList = []
+    for a, b, c in os.walk('./File'):
+        for i in c:
+            fileList.append('./File/' + i)
+    clientSocket.send(str(len(fileList)).encode('utf-8'))
+    for filename in fileList:
+        # get filename without path
+        tmp = os.path.split(filename)[1]
+        # create a tmp file for encryption
+        tmpFile = os.path.split(filename)[0] + '/tmp' + os.path.splitext(filename)[1]
+        print(tmpFile)
+        # get key and iv from PRIVATE.key
+        with open('./PRIVATE.key', 'r') as fp:
+            key = fp.readline().encode('utf-8')
+            iv = fp.readline().encode('utf-8')
+        # file encrypt
+        aes._file_encrypt(filename, tmpFile, key, iv)
+        # send encrypted file
+        clientSocket.send(tmp.encode('utf-8'))
+        clientSocket.send(hex(os.path.getsize(tmpFile)).encode('utf-8'))
+        with open(tmpFile, 'rb') as fp:
+            while True:
+                data = fp.read(1024)
+                if not data:
+                    break
+                clientSocket.send(data)
+        os.remove(tmpFile)
+        # send bloom file
+        call = cdll.LoadLibrary('./bloom.dll')
+        ws._stat_word(call, filename)
+        clientSocket.send((tmp.split('.')[0] + '.bf').encode('utf-8'))
+        clientSocket.send(hex(os.path.getsize('./bloom.bf')).encode('utf-8'))
+        with open('./bloom.bf', 'rb') as fp:
+            while True:
+                data = fp.read(1024)
+                if not data:
+                    break
+                clientSocket.send(data)
+        os.remove('./bloom.bf')
+        print('... Upload Finish: %s' % filename)
 
 
 def _client_search(clientSocket):
-    while True:
-        msg = input('... send: ')
+    count = input('... number of keywords: ')
+    clientSocket.send(str(count).encode('utf-8'))
+    for i in range(int(count, 10)):
+        msg = input('... keyword: ')
         clientSocket.send(msg.encode('utf-8'))
-        if not msg:
-            break
+    count = int(clientSocket.recv(1024), 10)
+    for i in range(count):
+        result = clientSocket.recv(1024).decode('utf-8')
+        print(result)
     return
 
 

@@ -2,6 +2,8 @@ from socket import *
 import json
 import os.path
 from time import ctime
+from ctypes import *
+import BloomFilter as BF
 
 
 def loginVerify(clientSocket):
@@ -21,35 +23,61 @@ def loginVerify(clientSocket):
 
 
 def _server_receive(foldername, clientSocket):
-    filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
-    filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
-    print('... upload file: %s    size: %s' % (filename, filesize))
-    count = 0
-    with open(filename, 'wb') as fp:
-        while True:
-            data = clientSocket.recv(1024)
-            fp.write(data)
-            count += len(data)
-            if count == filesize:
-                break
-    filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
-    filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
-    count = 0
-    print('... upload file: %s    size: %s' % (filename, filesize))
-    with open(filename, 'wb') as fp:
-        while True:
-            data = clientSocket.recv(1024)
-            fp.write(data)
-            count += len(data)
-            if count == filesize:
-                break
+    filenum = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    for i in range(filenum):
+        filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
+        filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
+        print('... upload file: %s    size: %s' % (filename, filesize))
+        count = 0
+        with open(filename, 'wb') as fp:
+            while True:
+                data = clientSocket.recv(1024)
+                fp.write(data)
+                count += len(data)
+                if count == filesize:
+                    break
+        filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
+        filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
+        count = 0
+        print('... upload file: %s    size: %s' % (filename, filesize))
+        with open(filename, 'wb') as fp:
+            while True:
+                data = clientSocket.recv(1024)
+                fp.write(data)
+                count += len(data)
+                if count == filesize:
+                    break
     return
 
 
-def _server_search(foldername, wordList):
+def _server_search(clientSocket, foldername):
+    call = cdll.LoadLibrary('./bloom.dll')
+    fileList, resultList, wordList = [], [], []
+    count = clientSocket.recv(1024)
+    for i in range(int(count.decode('utf-8'), 10)):
+        data = clientSocket.recv(1024)
+        wordList.append(data.decode('utf-8'))
+    print('... KW List: ', wordList)
     for a, b, c in os.walk(foldername):
         for i in c:
-            print(i)
+            if i.split('.')[1] == 'bf':
+                fileList.append(i)
+    print('... All Files(BF): ', fileList)
+    for i in fileList:
+        count = 0
+        bfname = foldername + '/' + i
+        BF._bloom_read(call, bfname.encode('utf-8'))
+        for j in range(len(wordList)):
+            tmp = wordList[j][:]
+            if BF._bloom_check(call, tmp) == 1:
+                count += 1
+        if count == len(wordList):
+            resultList.append(i.split('.')[0])
+        BF._bloom_free(call)
+    clientSocket.send(str(len(resultList)).encode('utf-8'))
+    for i in resultList:
+        clientSocket.send(i.encode('utf-8'))
+    return resultList
 
 
 def _server_tcp():
@@ -81,11 +109,15 @@ def _server_tcp():
             if mode == '1':
                 _server_receive(foldername, clientSocket)
             elif mode == '2':
+                _server_search(clientSocket, foldername)
+                '''
                 while True:
+                    
                     msg = clientSocket.recv(1024).decode('utf-8')
                     print('... client: ', msg)
                     if not msg:
                         break
+                '''
         except ConnectionResetError:
             print('... client\'s connection fails')
         clientSocket.close()
