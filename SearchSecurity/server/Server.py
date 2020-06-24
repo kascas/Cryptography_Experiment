@@ -1,9 +1,7 @@
 from socket import *
 import json
 import os.path
-from time import ctime
-from ctypes import *
-import BloomFilter as BF
+from bloom import *
 
 
 def loginVerify(clientSocket):
@@ -51,7 +49,6 @@ def _server_receive(foldername, clientSocket):
 
 
 def _server_search(clientSocket, foldername):
-    call = cdll.LoadLibrary('./bloom.dll')
     fileList, resultList, wordList = [], [], []
     count = clientSocket.recv(1024)
     for i in range(int(count.decode('utf-8'), 10)):
@@ -60,21 +57,23 @@ def _server_search(clientSocket, foldername):
     print('... KW List: ', wordList)
     for a, b, c in os.walk(foldername):
         for i in c:
-            if i.split('.')[1] == 'bf':
+            if i.split('.')[1] == 'json':
                 fileList.append(i)
     print('... All Files(BF): ', fileList)
     for i in fileList:
         count = 0
         bfname = foldername + '/' + i
-        BF._bloom_read(call, bfname.encode('utf-8'))
+        bloom = bloom_read(bfname)
         for j in range(len(wordList)):
             tmp = wordList[j][:]
-            if BF._bloom_check(call, tmp) == 1:
+            if bloom_check(bloom, tmp) == 1:
                 count += 1
         if count == len(wordList):
             resultList.append(i.split('.')[0])
-        BF._bloom_delete(call)
-        print(bfname)
+        bloom_reset(bloom)
+        print('... Check:', bfname)
+    print('... Result:', resultList)
+    # send search result
     clientSocket.send(str(len(resultList)).encode('utf-8'))
     for i in resultList:
         clientSocket.send(i.encode('utf-8'))
@@ -111,14 +110,6 @@ def _server_tcp():
                 _server_receive(foldername, clientSocket)
             elif mode == '2':
                 _server_search(clientSocket, foldername)
-                '''
-                while True:
-                    
-                    msg = clientSocket.recv(1024).decode('utf-8')
-                    print('... client: ', msg)
-                    if not msg:
-                        break
-                '''
         except ConnectionResetError:
             print('... client\'s connection fails')
         except Exception as r:

@@ -2,7 +2,6 @@ from socket import *
 import os.path
 import AESFileEncrypt as aes
 import WordStat as ws
-from ctypes import *
 
 
 def login(clientSocket):
@@ -48,17 +47,16 @@ def _client_upload(clientSocket):
                 clientSocket.send(data)
         os.remove(tmpFile)
         # send bloom file
-        call = cdll.LoadLibrary('./bloom.dll')
-        ws._stat_word(call, filename)
-        clientSocket.send((tmp.split('.')[0] + '.bf').encode('utf-8'))
-        clientSocket.send(hex(os.path.getsize('./bloom.bf')).encode('utf-8'))
-        with open('./bloom.bf', 'rb') as fp:
+        ws._stat_word(filename)
+        clientSocket.send((tmp.split('.')[0] + '.json').encode('utf-8'))
+        clientSocket.send(hex(os.path.getsize('./bloom.json')).encode('utf-8'))
+        with open('./bloom.json', 'rb') as fp:
             while True:
                 data = fp.read(1024)
                 if not data:
                     break
                 clientSocket.send(data)
-        os.remove('./bloom.bf')
+        os.remove('./bloom.json')
         print('... Upload Finish: %s' % filename)
 
 
@@ -68,6 +66,7 @@ def _client_search(clientSocket):
     for i in range(int(count, 10)):
         msg = input('... keyword: ')
         clientSocket.send(msg.encode('utf-8'))
+    # print search result
     count = int(clientSocket.recv(1024), 10)
     for i in range(count):
         result = clientSocket.recv(1024).decode('utf-8')
