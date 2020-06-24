@@ -105,12 +105,15 @@ def bloom_read(filename):
 if __name__ == "__main__":
     bloom = {}
     bloom_init(bloom, 1000, 0.001)
-    bloom_add(bloom, 'hello')
+    for i in range(5):
+        word = input('word: ')
+        bloom_add(bloom, word)
+    bloom_print(bloom)
 
     bloom_write(bloom, './tmp.json')
     bloom_reset(bloom)
-    print('reset: ', bloom)
     bloom = bloom_read('./tmp.json')
 
-    print(bloom_check(bloom, 'hello'))
-    print(bloom)
+    while True:
+        word = input('check: ')
+        print(bloom_check(bloom, word))
