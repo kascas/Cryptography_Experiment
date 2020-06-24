@@ -19,12 +19,12 @@ def _stat_word(filename):
     bloom_init(bloom, entries, 1 / entries)
     for i in range(len(result)):
         bloom_add(bloom, result[i])
-    bloom_write(bloom, './bloom.bf')
+    bloom_write(bloom, './bloom.json')
     return
 
 
 if __name__ == "__main__":
     List = _stat_word('./File/a.txt')
-    bloom = bloom_read('./bloom.bf')
+    bloom = bloom_read('./bloom.json')
     while True:
         print(bloom_check(bloom, input('word: ')))
