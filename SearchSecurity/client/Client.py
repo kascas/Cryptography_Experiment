@@ -30,7 +30,6 @@ def _client_upload(clientSocket):
         tmp = os.path.split(filename)[1]
         # create a tmp file for encryption
         tmpFile = os.path.split(filename)[0] + '/tmp' + os.path.splitext(filename)[1]
-        print(tmpFile)
         # get key and iv from PRIVATE.key
         with open('./PRIVATE.key', 'r') as fp:
             key = fp.readline().encode('utf-8')
