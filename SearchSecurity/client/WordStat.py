@@ -1,10 +1,9 @@
 import string
-import BloomFilter as BF
-from ctypes import *
+from bloom import *
 
 
-def _stat_word(call, filename):
-    wordList = []
+def _stat_word(filename):
+    wordList, bloom = [], {}
     with open(filename, 'r', encoding='utf-8') as fp:
         for line in fp.readlines():
             line = line.strip('\n').lower()
@@ -17,16 +16,15 @@ def _stat_word(call, filename):
         entries = 1000
     else:
         entries = len(result)
-    BF._bloom_init(call, entries, 1 / entries)
+    bloom_init(bloom, entries, 1 / entries)
     for i in range(len(result)):
-        BF._bloom_add(call, result[i])
-    BF._bloom_write(call, './bloom.bf'.encode('utf-8'))
+        bloom_add(bloom, result[i])
+    bloom_write(bloom, './bloom.bf')
     return
 
 
 if __name__ == "__main__":
-    call = cdll.LoadLibrary('./bloom.dll')
-    List = _stat_word(call, './File/test1.txt')
-    BF._bloom_print(call)
+    List = _stat_word('./File/a.txt')
+    bloom = bloom_read('./bloom.bf')
     while True:
-        print(BF._bloom_check(call, input('word: ')))
+        print(bloom_check(bloom, input('word: ')))
