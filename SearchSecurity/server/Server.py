@@ -2,6 +2,7 @@ from socket import *
 import json
 import os.path
 from bloom import *
+import time
 
 
 def loginVerify(clientSocket):
@@ -73,11 +74,32 @@ def _server_search(clientSocket, foldername):
         bloom_reset(bloom)
         print('... Check:', bfname)
     print('... Result:', resultList)
-    # send search result
-    clientSocket.send(str(len(resultList)).encode('utf-8'))
-    for i in resultList:
-        clientSocket.send(i.encode('utf-8'))
     return resultList
+
+
+def _server_return(clientSocket, foldername, resultList):
+    clientSocket.send(str(len(resultList)).encode('utf-8'))
+    fileList = []
+    for a, b, c in os.walk(foldername):
+        for i in c:
+            if i.split('.')[1] != 'json' and (i.split('.')[0] in resultList):
+                fileList.append(i)
+    for i in fileList:
+        filename = foldername + '/' + i
+        filesize = os.path.getsize(filename)
+        filecount = 0
+        print('... Return:', filename, filesize)
+        clientSocket.send(i.encode('utf-8'))
+        clientSocket.send(hex(filesize).encode('utf-8'))
+        with open(filename, 'rb') as fp:
+            while True:
+                data = fp.read(1024)
+                clientSocket.send(data)
+                filecount += len(data)
+                if filecount == filesize:
+                    break
+        time.sleep(0.1)
+    return
 
 
 def _server_tcp():
@@ -109,7 +131,8 @@ def _server_tcp():
             if mode == '1':
                 _server_receive(foldername, clientSocket)
             elif mode == '2':
-                _server_search(clientSocket, foldername)
+                resultList = _server_search(clientSocket, foldername)
+                _server_return(clientSocket, foldername, resultList)
         except ConnectionResetError:
             print('... client\'s connection fails')
         except Exception as r:
@@ -121,3 +144,4 @@ def _server_tcp():
 
 if __name__ == '__main__':
     _server_tcp()
+    os.system('pause')

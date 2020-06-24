@@ -2,6 +2,7 @@ from socket import *
 import os.path
 import AESFileEncrypt as aes
 import WordStat as ws
+import time
 
 
 def login(clientSocket):
@@ -46,6 +47,7 @@ def _client_upload(clientSocket):
                     break
                 clientSocket.send(data)
         os.remove(tmpFile)
+        time.sleep(0.1)
         # send bloom file
         ws._stat_word(filename)
         clientSocket.send((tmp.split('.')[0] + '.json').encode('utf-8'))
@@ -57,20 +59,47 @@ def _client_upload(clientSocket):
                     break
                 clientSocket.send(data)
         os.remove('./bloom.json')
+        time.sleep(0.1)
         print('... Upload Finish: %s' % filename)
 
 
 def _client_search(clientSocket):
     count = input('... number of keywords: ')
+    fileList = []
+    # delete all files in folder 'Search'
+    for a, b, c in os.walk('./Search'):
+        for i in c:
+            os.remove('./Search/' + i)
+    # send keywords and the number of keywords
     clientSocket.send(str(count).encode('utf-8'))
     for i in range(int(count, 10)):
         msg = input('... keyword: ')
         clientSocket.send(msg.encode('utf-8'))
-    # print search result
-    count = int(clientSocket.recv(1024), 10)
+    # get the number of results
+    count = int(clientSocket.recv(1024).decode('utf-8'), 10)
     for i in range(count):
-        result = clientSocket.recv(1024).decode('utf-8')
-        print(result)
+        filename = clientSocket.recv(1024).decode('utf-8')
+        filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
+        print('... receive:', filename, filesize)
+        filecount = 0
+        tmpFile = filename.split('.')[0] + '_tmp.' + filename.split('.')[1]
+        with open('./Search/' + tmpFile, 'wb') as fp:
+            while True:
+                data = clientSocket.recv(1024)
+                fp.write(data)
+                filecount += len(data)
+                if filecount == filesize:
+                    break
+        fileList.append(filename)
+    # decrypt tmp files
+    for filename in fileList:
+        tmpFile = './Search/' + filename.split('.')[0] + '_tmp.' + filename.split('.')[1]
+        with open('./PRIVATE.key', 'r') as fp:
+            key = fp.readline().encode('utf-8')
+            iv = fp.readline().encode('utf-8')
+        aes._file_decrypt(tmpFile, './Search/' + filename, key, iv)
+        os.remove(tmpFile)
+    print('... search finish, quit')
     return
 
 
@@ -101,3 +130,4 @@ def _client_tcp(ip, port):
 
 if __name__ == '__main__':
     _client_tcp('127.0.0.1', 80)
+    os.system('pause')
