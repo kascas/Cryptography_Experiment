@@ -60,6 +60,7 @@ def _client_upload(clientSocket):
         os.remove('./bloom.json')
         time.sleep(0.1)
         print('... Upload Finish: %s' % filename)
+        print('... Upload Finish: %s' % ('./File/' + tmp.split('.')[0] + '.json'))
 
 
 def _client_search(clientSocket):
@@ -113,6 +114,7 @@ def _client_tcp(ip, port):
         else:
             print('<login success>')
             break
+    print('-------------')
     # select a mode: upload or search
     while True:
         mode = input('upload[1] or search[2]: ')
