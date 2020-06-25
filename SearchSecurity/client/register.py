@@ -11,7 +11,7 @@ def register(ip, port):
     password = input('... password: ').encode('utf-8')
     clientSocket.send(username)
     clientSocket.send(password)
-    print(clientSocket.recv(1024).decode('utf-8'))
+    print('... register: '+clientSocket.recv(1024).decode('utf-8'))
     return
 
 
