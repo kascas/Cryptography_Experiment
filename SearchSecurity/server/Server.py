@@ -120,19 +120,22 @@ def _server_return(clientSocket, foldername, resultList):
 
 
 def _server_register(clientSocket):
+    n, e, d = rsa_init()
+    clientSocket.send(hex(n).encode('utf-8'))
+    clientSocket.send(hex(e).encode('utf-8'))
     username = clientSocket.recv(1024).decode('utf-8')
-    password = clientSocket.recv(1024).decode('utf-8')
+    password = clientSocket.recv(1024)
     with open('./User.json', 'r') as fp:
         text = fp.read()
     data = json.loads(text)
-    data[username] = password
+    data[username] = RSAES_OAEP_D(n, d, password).decode('utf-8')
     with open('./User.json', 'w') as fp:
         js = dumps(data)
         fp.write(js)
     clientSocket.send('success'.encode('utf-8'))
     print('... new user: ')
     print('...     Username: %s' % username)
-    print('...     Password: %s' % password)
+    print('...     Password: %s' % data[username])
     return
 
 
