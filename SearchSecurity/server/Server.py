@@ -127,8 +127,8 @@ def _server_register(clientSocket):
         fp.write(js)
     clientSocket.send('success'.encode('utf-8'))
     print('... new user: ')
-    print('...     %s' % username)
-    print('...     %s' % password)
+    print('...     Username: %s' % username)
+    print('...     Password: %s' % password)
     return
 
 
