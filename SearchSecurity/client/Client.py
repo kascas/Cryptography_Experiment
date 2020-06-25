@@ -20,11 +20,14 @@ def login(clientSocket):
 
 def _client_upload(clientSocket):
     # filename = input('... File Path: ')
+    # find all files in 'File'
     fileList = []
     for a, b, c in os.walk('./File'):
         for i in c:
             fileList.append('./File/' + i)
+    # send the number of files
     clientSocket.send(str(len(fileList)).encode('utf-8'))
+    # send files and their json-file
     for filename in fileList:
         # get filename without path
         tmp = os.path.split(filename)[1]
@@ -79,6 +82,7 @@ def _client_search(clientSocket):
     # get the number of results
     count = int(clientSocket.recv(1024).decode('utf-8'), 10)
     for i in range(count):
+        # get file's name and size
         filename = clientSocket.recv(1024).decode('utf-8')
         filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
         print('... receive:', filename, filesize)
@@ -95,6 +99,7 @@ def _client_search(clientSocket):
     # decrypt tmp files
     for filename in fileList:
         tmpFile = './Search/' + filename.split('.')[0] + '_tmp.' + filename.split('.')[1]
+        # get aes's key and iv
         with open('./PRIVATE.key', 'r') as fp:
             key = fp.readline().encode('utf-8')
             iv = fp.readline().encode('utf-8')
@@ -105,6 +110,11 @@ def _client_search(clientSocket):
 
 
 def _client_tcp(ip, port):
+    # if these two folder do not exist, create them
+    if not os.path.exists('./File'):
+        os.makedirs('./File')
+    if not os.path.exists('./Search'):
+        os.makedirs('./Search')
     # login to server
     while True:
         clientSocket = socket(AF_INET, SOCK_STREAM)

@@ -22,8 +22,10 @@ def loginVerify(clientSocket):
 
 
 def _server_receive(foldername, clientSocket):
+    # get the number of files
     filenum = int(clientSocket.recv(1024).decode('utf-8'), 16)
     for i in range(filenum):
+        # get file's name and size
         filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
         filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
         print('... upload file: %s    size: %s' % (filename, filesize))
@@ -35,6 +37,7 @@ def _server_receive(foldername, clientSocket):
                 count += len(data)
                 if count == filesize:
                     break
+        # get file's json-file
         filename = foldername + '/' + clientSocket.recv(1024).decode('utf-8')
         filesize = int(clientSocket.recv(1024).decode('utf-8'), 16)
         count = 0
@@ -51,11 +54,13 @@ def _server_receive(foldername, clientSocket):
 
 def _server_search(clientSocket, foldername):
     fileList, resultList, wordList = [], [], []
+    # get keywords
     count = clientSocket.recv(1024)
     for i in range(int(count.decode('utf-8'), 10)):
         data = clientSocket.recv(1024)
         wordList.append(data.decode('utf-8'))
     print('... KW List: ', wordList)
+    # find all json files
     for a, b, c in os.walk(foldername):
         for i in c:
             if i.split('.')[1] == 'json':
@@ -64,6 +69,7 @@ def _server_search(clientSocket, foldername):
     for i in fileList:
         count = 0
         bfname = foldername + '/' + i
+        # load bloom's info
         bloom = bloom_read(bfname)
         for j in range(len(wordList)):
             tmp = wordList[j][:]
@@ -71,6 +77,7 @@ def _server_search(clientSocket, foldername):
                 count += 1
         if count == len(wordList):
             resultList.append(i.split('.')[0])
+        # free bf
         bloom_reset(bloom)
         print('... Check:', bfname)
     print('... Result:', resultList)
@@ -78,12 +85,15 @@ def _server_search(clientSocket, foldername):
 
 
 def _server_return(clientSocket, foldername, resultList):
+    # send the number of result-files
     clientSocket.send(str(len(resultList)).encode('utf-8'))
     fileList = []
+    # find all result files
     for a, b, c in os.walk(foldername):
         for i in c:
             if i.split('.')[1] != 'json' and (i.split('.')[0] in resultList):
                 fileList.append(i)
+    # send result files
     for i in fileList:
         filename = foldername + '/' + i
         filesize = os.path.getsize(filename)
