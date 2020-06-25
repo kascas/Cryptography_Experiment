@@ -59,13 +59,14 @@ def _server_search(clientSocket, foldername):
     for i in range(int(count.decode('utf-8'), 10)):
         data = clientSocket.recv(1024)
         wordList.append(data)
-    print('... KW List: ', wordList)
+    # print('... KW List: ', wordList)
     # find all json files
     for a, b, c in os.walk(foldername):
         for i in c:
             if i.split('.')[1] == 'json':
                 fileList.append(i)
     print('... All Files(BF): ', fileList)
+    print('----------------')
     for i in fileList:
         count = 0
         bfname = foldername + '/' + i
@@ -80,6 +81,7 @@ def _server_search(clientSocket, foldername):
         # free bf
         bloom_reset(bloom)
         print('... Check:', bfname)
+    print('----------------')
     print('... Result:', resultList)
     return resultList
 
@@ -109,6 +111,7 @@ def _server_return(clientSocket, foldername, resultList):
                 if filecount == filesize:
                     break
         time.sleep(0.1)
+    print('----------------')
     return
 
 

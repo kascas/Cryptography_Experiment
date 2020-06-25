@@ -76,7 +76,6 @@ def _client_search(clientSocket):
         for i in c:
             os.remove('./Search/' + i)
     # send keywords and the number of keywords
-    # clientSocket.send(str(count).encode('utf-8'))
     key, iv = getKey()
     cipher = AES.new(key, AES.MODE_ECB)
     for i in range(int(count, 10)):
@@ -87,7 +86,7 @@ def _client_search(clientSocket):
     clientSocket.send(str(len(byteList)).encode('utf-8'))
     for i in range(len(byteList)):
         clientSocket.send(cipher.encrypt(byteList[i]))
-    print('------------')
+    print('----------------')
     # get the number of results
     count = int(clientSocket.recv(1024).decode('utf-8'), 10)
     for i in range(count):
@@ -129,11 +128,11 @@ def _client_tcp(ip, port):
         clientSocket = socket(AF_INET, SOCK_STREAM)
         clientSocket.connect((ip, port))
         if not login(clientSocket):
-            print('<login error>')
+            print('... <login error>')
         else:
-            print('<login success>')
+            print('... <login success>')
             break
-    print('-------------')
+    print('----------------')
     # select a mode: upload or search
     while True:
         mode = input('upload[1] or search[2]: ')
