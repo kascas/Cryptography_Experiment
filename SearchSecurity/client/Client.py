@@ -5,14 +5,17 @@ from Crypto.Cipher import AES
 from aes import *
 import WordStat as ws
 import time
+from RSA import *
 
 
 def login(clientSocket):
     print('>>> login')
+    n = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    e = int(clientSocket.recv(1024).decode('utf-8'), 16)
     name = input('... Username: ')
-    pswd = input('... Password: ')
+    pswd = RSAES_OAEP_E(n, e, input('... Password: ').encode('utf-8'))
     clientSocket.send(name.encode('utf-8'))
-    clientSocket.send(pswd.encode('utf-8'))
+    clientSocket.send(pswd)
     result = clientSocket.recv(1024).decode('utf-8')
     if result == 'success':
         return True

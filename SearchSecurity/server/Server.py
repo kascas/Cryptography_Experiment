@@ -3,11 +3,15 @@ import json
 import os.path
 from bloom import *
 import time
+from RSA import *
 
 
 def loginVerify(clientSocket):
+    n, e, d = rsa_init()
+    clientSocket.send(hex(n).encode('utf-8'))
+    clientSocket.send(hex(e).encode('utf-8'))
     name = clientSocket.recv(1024).decode('utf-8')
-    pswd = clientSocket.recv(1024).decode('utf-8')
+    pswd = clientSocket.recv(1024)
     with open('user.json', 'r') as fp:
         text = fp.read()
     data = json.loads(text)
@@ -15,7 +19,7 @@ def loginVerify(clientSocket):
     if value == None:
         return 'failure', name
     else:
-        if value == pswd:
+        if value == RSAES_OAEP_D(n, d, pswd).decode('utf-8'):
             return 'success', name
         else:
             return 'failure', name
