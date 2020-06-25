@@ -16,12 +16,10 @@ def _stat_word(filename):
                 tmp = word.strip(string.punctuation)
                 if tmp != '':
                     wordList.append(tmp)
-            '''        
             for i in range(len(cn)):
                 wordList.append(cn[i])
-            '''
-    # print(wordList)
     result = sorted(set(wordList), key=wordList.index)
+    print(result)
     if len(result) < 1000:
         entries = 1000
     else:
