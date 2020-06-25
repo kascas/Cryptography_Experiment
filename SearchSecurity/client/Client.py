@@ -128,6 +128,7 @@ def _client_tcp(ip, port):
     while True:
         clientSocket = socket(AF_INET, SOCK_STREAM)
         clientSocket.connect((ip, port))
+        clientSocket.send('log'.encode('utf-8'))
         if not login(clientSocket):
             print('... <login error>')
         else:

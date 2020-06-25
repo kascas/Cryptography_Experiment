@@ -99,6 +99,7 @@ def bloom_write(bloom, filename):
 def bloom_read(filename):
     fp = open(filename, encoding='utf-8')
     bloom = load(fp)
+    fp.close()
     return bloom
 
 

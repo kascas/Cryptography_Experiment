@@ -115,6 +115,23 @@ def _server_return(clientSocket, foldername, resultList):
     return
 
 
+def _server_register(clientSocket):
+    username = clientSocket.recv(1024).decode('utf-8')
+    password = clientSocket.recv(1024).decode('utf-8')
+    with open('./User.json', 'r') as fp:
+        text = fp.read()
+    data = json.loads(text)
+    data[username] = password
+    with open('./User.json', 'w') as fp:
+        js = dumps(data)
+        fp.write(js)
+    clientSocket.send('success'.encode('utf-8'))
+    print('... new user: ')
+    print('...     %s' % username)
+    print('...     %s' % password)
+    return
+
+
 def _server_tcp():
     serverSocket = socket(AF_INET, SOCK_STREAM)
     serverSocket.bind(('', 80))
@@ -126,28 +143,33 @@ def _server_tcp():
         clientSocket, clientAddr = serverSocket.accept()
         print('... connected from: ', clientAddr)
         try:
-            # user login
-            result = loginVerify(clientSocket)
-            clientSocket.send(result[0].encode('utf-8'))
-            # if login fails, close clientsocket and continue
-            if result[0] == 'failure':
-                clientSocket.close()
-                print('<illegal login>')
+            log_reg = clientSocket.recv(1024).decode('utf-8')
+            if log_reg == 'reg':
+                _server_register(clientSocket)
                 continue
-            else:
-                print('... user <%s> login' % result[1])
-            # find the user's folder
-            foldername = './user/' + result[1]
-            if not os.path.exists(foldername):
-                os.makedirs(foldername)
-            # receive 'mode' from client
-            mode = clientSocket.recv(1024).decode('utf-8')
-            # client wants to upload file
-            if mode == '1':
-                _server_receive(foldername, clientSocket)
-            elif mode == '2':
-                resultList = _server_search(clientSocket, foldername)
-                _server_return(clientSocket, foldername, resultList)
+            if log_reg == 'log':
+                # user login
+                result = loginVerify(clientSocket)
+                clientSocket.send(result[0].encode('utf-8'))
+                # if login fails, close clientsocket and continue
+                if result[0] == 'failure':
+                    clientSocket.close()
+                    print('<illegal login>')
+                    continue
+                else:
+                    print('... user <%s> login' % result[1])
+                # find the user's folder
+                foldername = './user/' + result[1]
+                if not os.path.exists(foldername):
+                    os.makedirs(foldername)
+                # receive 'mode' from client
+                mode = clientSocket.recv(1024).decode('utf-8')
+                # client wants to upload file
+                if mode == '1':
+                    _server_receive(foldername, clientSocket)
+                elif mode == '2':
+                    resultList = _server_search(clientSocket, foldername)
+                    _server_return(clientSocket, foldername, resultList)
         except ConnectionResetError:
             print('... client\'s connection fails')
         except Exception as r:
