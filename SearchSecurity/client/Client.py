@@ -133,12 +133,12 @@ def _client_tcp(ip, port):
         else:
             print('... <login success>')
             break
-    print('----------------')
     # select a mode: upload or search
     while True:
-        mode = input('upload[1] or search[2]: ')
+        mode = input('... upload[1] or search[2]: ')
         if mode == '1' or mode == '2':
             break
+    print('----------------')
     # send 'mode' to server
     clientSocket.send(mode.encode('utf-8'))
     # 'upload' may send a encrypted file to server
