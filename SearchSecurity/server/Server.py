@@ -58,7 +58,7 @@ def _server_search(clientSocket, foldername):
     count = clientSocket.recv(1024)
     for i in range(int(count.decode('utf-8'), 10)):
         data = clientSocket.recv(1024)
-        wordList.append(data.decode('utf-8'))
+        wordList.append(data)
     print('... KW List: ', wordList)
     # find all json files
     for a, b, c in os.walk(foldername):
@@ -73,7 +73,7 @@ def _server_search(clientSocket, foldername):
         bloom = bloom_read(bfname)
         for j in range(len(wordList)):
             tmp = wordList[j][:]
-            if bloom_check(bloom, tmp.encode('utf-8')) == 1:
+            if bloom_check(bloom, tmp) == 1:
                 count += 1
         if count == len(wordList):
             resultList.append(i.split('.')[0])

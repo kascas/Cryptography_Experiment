@@ -1,6 +1,8 @@
 from socket import *
 import os.path
 import AESFileEncrypt as aes
+from Crypto.Cipher import AES
+from aes import *
 import WordStat as ws
 import time
 
@@ -68,16 +70,23 @@ def _client_upload(clientSocket):
 
 def _client_search(clientSocket):
     count = input('... number of keywords: ')
-    fileList = []
+    fileList, byteList, num = [], [], 0
     # delete all files in folder 'Search'
     for a, b, c in os.walk('./Search'):
         for i in c:
             os.remove('./Search/' + i)
     # send keywords and the number of keywords
-    clientSocket.send(str(count).encode('utf-8'))
+    # clientSocket.send(str(count).encode('utf-8'))
+    key, iv = getKey()
+    cipher = AES.new(key, AES.MODE_ECB)
     for i in range(int(count, 10)):
-        msg = input('... keyword: ')
-        clientSocket.send(msg.encode('utf-8'))
+        msg = input('... keyword: ').encode('utf-8')
+        msgList = padding(msg)
+        for j in msgList:
+            byteList.append(j)
+    clientSocket.send(str(len(byteList)).encode('utf-8'))
+    for i in range(len(byteList)):
+        clientSocket.send(cipher.encrypt(byteList[i]))
     print('------------')
     # get the number of results
     count = int(clientSocket.recv(1024).decode('utf-8'), 10)

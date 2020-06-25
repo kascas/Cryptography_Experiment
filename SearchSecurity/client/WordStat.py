@@ -1,6 +1,8 @@
 import string
 from bloom import *
 import re
+from Crypto.Cipher import AES
+from aes import *
 
 
 def _stat_word(filename):
@@ -30,8 +32,12 @@ def _stat_word(filename):
         entries = len(result)
     bloom_init(bloom, entries, 1 / entries)
     # put words into bf
+    key, iv = getKey()
+    cipher = AES.new(key, AES.MODE_ECB)
     for i in range(len(result)):
-        bloom_add(bloom, result[i].encode('utf-8'))
+        List = padding(result[i].encode('utf-8'))
+        for j in List:
+            bloom_add(bloom, cipher.encrypt(j))
     bloom_write(bloom, './bloom.json')
     return
 
