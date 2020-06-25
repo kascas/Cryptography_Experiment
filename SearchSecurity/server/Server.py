@@ -119,6 +119,8 @@ def _server_tcp():
     serverSocket = socket(AF_INET, SOCK_STREAM)
     serverSocket.bind(('', 80))
     serverSocket.listen(5)
+    if not os.path.exists('./user'):
+        os.makedirs('./user')
     while True:
         print('\n>>> waiting for connection')
         clientSocket, clientAddr = serverSocket.accept()
