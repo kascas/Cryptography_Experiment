@@ -73,7 +73,7 @@ def _server_search(clientSocket, foldername):
         bloom = bloom_read(bfname)
         for j in range(len(wordList)):
             tmp = wordList[j][:]
-            if bloom_check(bloom, tmp) == 1:
+            if bloom_check(bloom, tmp.encode('utf-8')) == 1:
                 count += 1
         if count == len(wordList):
             resultList.append(i.split('.')[0])

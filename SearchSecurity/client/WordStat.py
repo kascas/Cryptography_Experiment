@@ -31,7 +31,7 @@ def _stat_word(filename):
     bloom_init(bloom, entries, 1 / entries)
     # put words into bf
     for i in range(len(result)):
-        bloom_add(bloom, result[i])
+        bloom_add(bloom, result[i].encode('utf-8'))
     bloom_write(bloom, './bloom.json')
     return
 
