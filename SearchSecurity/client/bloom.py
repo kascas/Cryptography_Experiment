@@ -91,7 +91,7 @@ def bloom_reset(bloom):
 
 def bloom_write(bloom, filename):
     with open(filename, 'w') as fp:
-        js = dumps(bloom, indent=4)
+        js = dumps(bloom)
         fp.write(js)
     return
 
