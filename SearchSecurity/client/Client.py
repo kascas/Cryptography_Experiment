@@ -114,7 +114,7 @@ def _client_search(clientSocket):
             iv = fp.readline().encode('utf-8')
         aes._file_decrypt(tmpFile, './Search/' + filename, key, iv)
         os.remove(tmpFile)
-    print('... search finish, quit')
+    print('... search finish')
     return
 
 

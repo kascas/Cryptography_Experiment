@@ -68,3 +68,4 @@ if __name__ == "__main__":
     bloom = bloom_read('./bloom.json')
     while True:
         print(bloom_check(bloom, input('word: ')))
+
