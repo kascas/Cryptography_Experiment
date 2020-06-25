@@ -74,6 +74,7 @@ def _client_search(clientSocket):
     for i in range(int(count, 10)):
         msg = input('... keyword: ')
         clientSocket.send(msg.encode('utf-8'))
+    print('------------')
     # get the number of results
     count = int(clientSocket.recv(1024).decode('utf-8'), 10)
     for i in range(count):
