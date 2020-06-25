@@ -69,8 +69,7 @@ def _client_upload(clientSocket):
 
 
 def _client_search(clientSocket):
-    count = input('... number of keywords: ')
-    fileList, byteList, num = [], [], 0
+    fileList, wordList, byteList, num = [], [], [], 0
     # delete all files in folder 'Search'
     for a, b, c in os.walk('./Search'):
         for i in c:
@@ -78,9 +77,11 @@ def _client_search(clientSocket):
     # send keywords and the number of keywords
     key, iv = getKey()
     cipher = AES.new(key, AES.MODE_ECB)
-    for i in range(int(count, 10)):
-        msg = input('... keyword: ').encode('utf-8')
-        msgList = padding(msg)
+    line = input('... keyword: ')
+    # get words from line
+    wordList = ws._word_extract(line)
+    for i in wordList:
+        msgList = padding(i.encode('utf-8'))
         for j in msgList:
             byteList.append(j)
     clientSocket.send(str(len(byteList)).encode('utf-8'))
