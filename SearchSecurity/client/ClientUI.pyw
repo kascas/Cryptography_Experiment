@@ -188,7 +188,7 @@ password_label.place(x=240, y=192)
 password_entry.place(x=320, y=192)
 
 login_button = tk.Button(root, text="login", width="10", height=1, command=_login_)
-login_button.place(x=320, y=218)
+login_button.place(x=320, y=224)
 
 upload_button = tk.Button(root, text="Upload", width="10", height=1, command=_upload_)
 upload_button.place(x=240, y=480)
