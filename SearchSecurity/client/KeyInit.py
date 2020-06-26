@@ -14,8 +14,11 @@ def FileKeyinit():
 
 def WordKeyInit():
     word_key = secrets.token_bytes(16)
+    mask = secrets.token_bytes(16)
     with open('WORD.KEY', 'wb') as fp:
         fp.write(word_key)
+        fp.write(b'\n')
+        fp.write(mask)
     return
 
 

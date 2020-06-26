@@ -33,7 +33,7 @@ def _stat_word(filename):
         entries = len(result)
     bloom_init(bloom, entries, 1 / entries)
     # put words into bf
-    key = getWordKey()
+    key, mask = getWordKey()
     cipher = AES.new(key, AES.MODE_ECB)
     for i in range(len(result)):
         List = padding(result[i].encode('utf-8'))

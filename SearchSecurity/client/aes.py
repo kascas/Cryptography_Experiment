@@ -19,11 +19,16 @@ def getFileKey():
 def getWordKey():
     with open('./WORD.KEY', 'rb') as fp:
         key = fp.readline()
+        mask = fp.readline()
         if len(key) < 16:
             key += b'\x00' * (16 - len(key))
         else:
             key = key[0:16]
-    return key
+        if len(mask) < 16:
+            mask += b'\x00' * (16 - len(mask))
+        else:
+            mask = mask[0:16]
+    return key, mask
 
 
 def padding(buf):

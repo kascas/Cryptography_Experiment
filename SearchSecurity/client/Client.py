@@ -78,7 +78,7 @@ def _client_search(clientSocket):
         for i in c:
             os.remove('./Search/' + i)
     # send keywords and the number of keywords
-    key = getWordKey()
+    key, mask = getWordKey()
     cipher = AES.new(key, AES.MODE_ECB)
     line = input('... keyword: ')
     # get words from line
