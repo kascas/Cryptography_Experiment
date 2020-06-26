@@ -26,10 +26,11 @@ def login(clientSocket):
 def _client_upload(clientSocket):
     # filename = input('... File Path: ')
     # find all files in 'File'
-    fileList = []
+    fileList, allFile = [], []
     for a, b, c in os.walk('./File'):
         for i in c:
             fileList.append('./File/' + i)
+            allFile.append('./File/' + i)
     # send the number of files
     clientSocket.send(str(len(fileList)).encode('utf-8'))
     # send files and their json-file
@@ -53,7 +54,6 @@ def _client_upload(clientSocket):
                 if not data:
                     break
                 clientSocket.send(data)
-        os.remove(tmpFile)
         time.sleep(0.1)
         # send bloom file
         ws._stat_word(filename)
@@ -65,13 +65,16 @@ def _client_upload(clientSocket):
                 if not data:
                     break
                 clientSocket.send(data)
+        os.remove(tmpFile)
         os.remove('./bloom.json')
         time.sleep(0.1)
+        allFile.append(tmp.split('.')[0] + '.json')
         print('... Upload Finish: %s' % filename)
         print('... Upload Finish: %s' % ('./File/' + tmp.split('.')[0] + '.json'))
+    return allFile
 
 
-def _client_search(clientSocket):
+def _client_search(clientSocket, line):
     fileList, wordList, byteList, num = [], [], [], 0
     # delete all files in folder 'Search'
     for a, b, c in os.walk('./Search'):
@@ -80,7 +83,7 @@ def _client_search(clientSocket):
     # send keywords and the number of keywords
     key, mask = getWordKey()
     cipher = AES.new(key, AES.MODE_ECB)
-    line = input('... keyword: ')
+
     # get words from line
     wordList = ws._word_extract(line)
     for i in wordList:
@@ -149,7 +152,8 @@ def _client_tcp(ip, port):
     if mode == '1':
         _client_upload(clientSocket)
     else:
-        _client_search(clientSocket)
+        line = input('... keyword: ')
+        _client_search(clientSocket, line)
     clientSocket.close()
 
 
