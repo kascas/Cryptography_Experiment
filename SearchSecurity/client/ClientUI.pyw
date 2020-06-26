@@ -17,6 +17,8 @@ username = StringVar()
 password = StringVar()
 ip = StringVar()
 port = IntVar()
+ip_value = ''
+port_value = 0
 fileList = []
 
 
@@ -53,7 +55,9 @@ def print_search_files():
 
 
 def _connect_():
+    global clientSocket
     try:
+        clientSocket = socket(AF_INET, SOCK_STREAM)
         ip_value = ip.get()
         port_value = port.get()
         clientSocket.connect((ip_value, port_value))
@@ -67,7 +71,23 @@ def _connect_():
     return
 
 
+def _connect_without_msgbox():
+    global clientSocket
+    try:
+        clientSocket = socket(AF_INET, SOCK_STREAM)
+        ip_value = ip.get()
+        port_value = port.get()
+        clientSocket.connect((ip_value, port_value))
+    except Exception as s:
+        print(s)
+        return
+    ip_entry['state'] = 'disabled'
+    port_entry['state'] = 'disabled'
+    return
+
+
 def _login_():
+    global clientSocket
     clientSocket.send('log'.encode('utf-8'))
     n = int(clientSocket.recv(1024).decode('utf-8'), 16)
     e = int(clientSocket.recv(1024).decode('utf-8'), 16)
@@ -83,24 +103,51 @@ def _login_():
         return True
     elif result == 'failure':
         tkinter.messagebox.showinfo('note', 'login failure')
+        _connect_without_msgbox()
+        return False
+
+
+def _login_without_msgbox():
+    global clientSocket
+    clientSocket.send('log'.encode('utf-8'))
+    n = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    e = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    name = username.get()
+    pswd = RSAES_OAEP_E(n, e, password.get().encode('utf-8'))
+    clientSocket.send(name.encode('utf-8'))
+    clientSocket.send(pswd)
+    result = clientSocket.recv(1024).decode('utf-8')
+    if result == 'success':
+        password_entry['state'] = 'disabled'
+        username_entry['state'] = 'disabled'
+        return True
+    elif result == 'failure':
+        _connect_without_msgbox()
         return False
 
 
 def _upload_():
     clientSocket.send('1'.encode('utf-8'))
     uploadfile = []
+    text_3['state'] = 'normal'
+    text_3.delete('0.0', END)
     try:
         uploadfile = client._client_upload(clientSocket)
     except Exception:
         tkinter.messagebox.showinfo('note', 'upload failes, try again')
     for file in uploadfile:
         text_3.insert('insert', file.replace('./File/', '') + '\n')
+    tkinter.messagebox.showinfo('note', 'upload success')
     text_3['state'] = 'disabled'
     clientSocket.close()
+    _connect_without_msgbox()
+    _login_without_msgbox()
     return
 
 
 def _search_():
+    text_2['state'] = 'normal'
+    text_2.delete('0.0', END)
     clientSocket.send('2'.encode('utf-8'))
     line = search_text.get('0.0', END)
     try:
@@ -108,7 +155,11 @@ def _search_():
     except Exception:
         tkinter.messagebox.showinfo('note', 'search failes, try again')
     print_search_files()
+    text_2['state'] = 'disabled'
+    tkinter.messagebox.showinfo('note', 'search success')
     clientSocket.close()
+    _connect_without_msgbox()
+    _login_without_msgbox()
     return
 
 
@@ -166,7 +217,7 @@ label_2 = tk.Label(root, text="Search result", font=("宋体", 10))
 label_2.place(x=512, y=16)
 frame_2 = tk.Frame(root)
 scroll_2 = tk.Scrollbar(frame_2)
-text_2 = tk.Text(frame_2, height=36, width=24, font=("宋体", 10))
+text_2 = tk.Text(frame_2, height=36, width=24, font=("宋体", 10), state='disabled')
 scroll_2.pack(side=tk.RIGHT, fill=tk.Y)
 text_2.config(yscrollcommand=scroll_2.set)
 text_2.pack(side=tk.LEFT)
@@ -177,7 +228,7 @@ label_3 = tk.Label(root, text="Upload", font=("宋体", 10))
 label_3.place(x=240, y=350)
 frame_3 = tk.Frame(root)
 scroll_3 = tk.Scrollbar(frame_3)
-text_3 = tk.Text(frame_3, height=8, width=20, font=("宋体", 10))
+text_3 = tk.Text(frame_3, height=8, width=20, font=("宋体", 10), state='disabled')
 scroll_3.pack(side=tk.RIGHT, fill=tk.Y)
 text_3.config(yscrollcommand=scroll_3.set)
 text_3.pack(side=tk.LEFT)
