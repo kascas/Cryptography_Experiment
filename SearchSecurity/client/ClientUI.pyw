@@ -91,9 +91,9 @@ def _login_():
     clientSocket.send('log'.encode('utf-8'))
     n = int(clientSocket.recv(1024).decode('utf-8'), 16)
     e = int(clientSocket.recv(1024).decode('utf-8'), 16)
-    name = username.get()
+    name = RSAES_OAEP_E(n, e, username.get().encode('utf-8'))
     pswd = RSAES_OAEP_E(n, e, password.get().encode('utf-8'))
-    clientSocket.send(name.encode('utf-8'))
+    clientSocket.send(name)
     clientSocket.send(pswd)
     result = clientSocket.recv(1024).decode('utf-8')
     if result == 'success':
@@ -112,9 +112,9 @@ def _login_without_msgbox():
     clientSocket.send('log'.encode('utf-8'))
     n = int(clientSocket.recv(1024).decode('utf-8'), 16)
     e = int(clientSocket.recv(1024).decode('utf-8'), 16)
-    name = username.get()
+    name = RSAES_OAEP_E(n, e, username.get().encode('utf-8'))
     pswd = RSAES_OAEP_E(n, e, password.get().encode('utf-8'))
-    clientSocket.send(name.encode('utf-8'))
+    clientSocket.send(name)
     clientSocket.send(pswd)
     result = clientSocket.recv(1024).decode('utf-8')
     if result == 'success':
@@ -135,6 +135,7 @@ def _upload_():
         uploadfile = client._client_upload(clientSocket)
     except Exception:
         tkinter.messagebox.showinfo('note', 'upload failes, try again')
+        return
     for file in uploadfile:
         text_3.insert('insert', file.replace('./File/', '') + '\n')
     tkinter.messagebox.showinfo('note', 'upload success')
@@ -154,6 +155,7 @@ def _search_():
         client._client_search(clientSocket, line)
     except Exception:
         tkinter.messagebox.showinfo('note', 'search failes, try again')
+        return
     print_search_files()
     text_2['state'] = 'disabled'
     tkinter.messagebox.showinfo('note', 'search success')
