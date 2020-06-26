@@ -3,6 +3,7 @@ from bloom import *
 import re
 from Crypto.Cipher import AES
 from aes import *
+from KeyInit import *
 
 
 def _stat_word(filename):
@@ -32,7 +33,7 @@ def _stat_word(filename):
         entries = len(result)
     bloom_init(bloom, entries, 1 / entries)
     # put words into bf
-    key, iv = getKey()
+    key = getWordKey()
     cipher = AES.new(key, AES.MODE_ECB)
     for i in range(len(result)):
         List = padding(result[i].encode('utf-8'))
@@ -68,4 +69,3 @@ if __name__ == "__main__":
     bloom = bloom_read('./bloom.json')
     while True:
         print(bloom_check(bloom, input('word: ')))
-

@@ -1,10 +1,10 @@
 import math
 
 
-def getKey():
-    with open('./PRIVATE.key', 'r') as fp:
-        key = fp.readline().encode('utf-8')
-        iv = fp.readline().encode('utf-8')
+def getFileKey():
+    with open('./FILE.KEY', 'rb') as fp:
+        key = fp.readline()
+        iv = fp.readline()
         if len(key) < 16:
             key += b'\x00' * (16 - len(key))
         else:
@@ -14,6 +14,16 @@ def getKey():
         else:
             iv = iv[0:16]
     return key, iv
+
+
+def getWordKey():
+    with open('./WORD.KEY', 'rb') as fp:
+        key = fp.readline()
+        if len(key) < 16:
+            key += b'\x00' * (16 - len(key))
+        else:
+            key = key[0:16]
+    return key
 
 
 def padding(buf):

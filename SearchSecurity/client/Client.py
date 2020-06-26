@@ -39,7 +39,7 @@ def _client_upload(clientSocket):
         # create a tmp file for encryption
         tmpFile = os.path.split(filename)[0] + '/tmp' + os.path.splitext(filename)[1]
         # get key and iv from PRIVATE.key
-        with open('./AES.KEY', 'rb') as fp:
+        with open('FILE.KEY', 'rb') as fp:
             key = fp.readline()
             iv = fp.readline()
         # file encrypt
@@ -78,7 +78,7 @@ def _client_search(clientSocket):
         for i in c:
             os.remove('./Search/' + i)
     # send keywords and the number of keywords
-    key, iv = getKey()
+    key = getWordKey()
     cipher = AES.new(key, AES.MODE_ECB)
     line = input('... keyword: ')
     # get words from line
@@ -112,7 +112,7 @@ def _client_search(clientSocket):
     for filename in fileList:
         tmpFile = './Search/' + filename.split('.')[0] + '_tmp.' + filename.split('.')[1]
         # get aes's key and iv
-        with open('./AES.KEY', 'rb') as fp:
+        with open('FILE.KEY', 'rb') as fp:
             key = fp.readline()
             iv = fp.readline()
         aes._file_decrypt(tmpFile, './Search/' + filename, key, iv)
