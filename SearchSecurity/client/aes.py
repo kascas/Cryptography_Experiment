@@ -1,4 +1,5 @@
 import math
+import hashlib
 
 
 def getFileKey():
@@ -32,10 +33,9 @@ def getWordKey():
 
 
 def padding(buf):
-    bufList, length = [], len(buf)
-    listLen = math.ceil(length / 16)
-    for i in range(listLen - 1):
-        bufList.append(buf[i * 16:(i + 1) * 16])
-    bufPad = buf[-1 * (length % 16):] + (16 - length % 16) * b'\x00'
-    bufList.append(bufPad)
+    bufList, padLen = [], len(buf) % 16
+    listLen = math.ceil(len(buf) / 16)
+    for i in range(listLen):
+        pad = hashlib.sha1(buf).hexdigest().replace('0x', '')[0:(16 - padLen)].encode('utf-8')
+        bufList.append(buf[-1 * padLen:] + pad)
     return bufList
