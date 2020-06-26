@@ -10,19 +10,20 @@ def loginVerify(clientSocket):
     n, e, d = rsa_init()
     clientSocket.send(hex(n).encode('utf-8'))
     clientSocket.send(hex(e).encode('utf-8'))
-    name = clientSocket.recv(1024).decode('utf-8')
+    name = clientSocket.recv(1024)
     pswd = clientSocket.recv(1024)
     with open('user.json', 'r') as fp:
         text = fp.read()
     data = json.loads(text)
-    value = data.get(name)
+    user = RSAES_OAEP_D(n, d, name).decode('utf-8')
+    value = data.get(user)
     if value == None:
-        return 'failure', name
+        return 'failure', user
     else:
         if value == RSAES_OAEP_D(n, d, pswd).decode('utf-8'):
-            return 'success', name
+            return 'success', user
         else:
-            return 'failure', name
+            return 'failure', user
 
 
 def _server_receive(foldername, clientSocket):
@@ -123,7 +124,7 @@ def _server_register(clientSocket):
     n, e, d = rsa_init()
     clientSocket.send(hex(n).encode('utf-8'))
     clientSocket.send(hex(e).encode('utf-8'))
-    username = clientSocket.recv(1024).decode('utf-8')
+    username = RSAES_OAEP_D(n, d, clientSocket.recv(1024)).decode('utf-8')
     password = clientSocket.recv(1024)
     with open('./User.json', 'r') as fp:
         text = fp.read()
