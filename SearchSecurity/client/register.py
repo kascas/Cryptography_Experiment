@@ -10,7 +10,7 @@ def register(ip, port):
     print('>>> register')
     n = int(clientSocket.recv(1024).decode('utf-8'), 16)
     e = int(clientSocket.recv(1024).decode('utf-8'), 16)
-    username = input('... username: ').encode('utf-8')
+    username = RSAES_OAEP_E(n, e, input('... username: ').encode('utf-8'))
     password = RSAES_OAEP_E(n, e, input('... password: ').encode('utf-8'))
     clientSocket.send(username)
     clientSocket.send(password)
