@@ -33,13 +33,12 @@ def WordKeyInit(KeyFolder):
 
 
 def KeyInit():
-    KeyFolder = './Keys/' + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    if not os.path.exists(KeyFolder):
-        os.makedirs(KeyFolder)
-    FileKeyinit(KeyFolder)
-    # WordKeyInit(KeyFolder)
-    # with open('Record.json', 'w') as fp:
-    #    fp.write('{\"test\":\"test\"}')
+    key = secrets.token_bytes(16)
+    iv = secrets.token_bytes(16)
+    with open('FILE.KEY', 'wb') as fp:
+        fp.write(key)
+        fp.write(b'\n')
+        fp.write(iv)
     return
 
 

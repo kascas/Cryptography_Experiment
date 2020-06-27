@@ -44,9 +44,6 @@ def _client_upload(clientSocket):
     clientSocket.send(str(len(fileList)).encode('utf-8'))
     with open('Record.json', 'r') as fp:
         d = loads(fp.read())
-    with open('FILE.KEY', 'rb') as fp:
-        version = fp.readlines()[2].decode('utf-8').replace('\n', '')
-    print('key version: ' + version)
     # send files and their json-file
     for filename in fileList:
         # get filename without path
