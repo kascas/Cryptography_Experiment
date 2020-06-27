@@ -125,11 +125,17 @@ def _server_register(clientSocket):
     clientSocket.send(hex(n).encode('utf-8'))
     clientSocket.send(hex(e).encode('utf-8'))
     username = RSAES_OAEP_D(n, d, clientSocket.recv(1024)).decode('utf-8')
-    password = clientSocket.recv(1024)
+    password = RSAES_OAEP_D(n, d, clientSocket.recv(1024)).decode('utf-8')
     with open('./User.json', 'r') as fp:
         text = fp.read()
     data = json.loads(text)
-    data[username] = RSAES_OAEP_D(n, d, password).decode('utf-8')
+    print(data)
+    print(username)
+    if username in data:
+        clientSocket.send('username already exists'.encode('utf-8'))
+        clientSocket.close()
+        return
+    data[username] = password
     with open('./User.json', 'w') as fp:
         js = dumps(data)
         fp.write(js)

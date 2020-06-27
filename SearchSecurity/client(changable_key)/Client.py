@@ -9,6 +9,14 @@ from RSA import *
 from json import *
 
 
+def tobytes(x, xLen):
+    x_array = bytearray(xLen)
+    for i in range(xLen):
+        x_array[xLen - 1 - i] = x & 0xff
+        x >>= 8
+    return x_array
+
+
 def login(clientSocket):
     print('>>> login')
     n = int(clientSocket.recv(1024).decode('utf-8'), 16)
@@ -47,9 +55,10 @@ def _client_upload(clientSocket):
         tmpFile = os.path.split(filename)[0] + '/tmp' + os.path.splitext(filename)[1]
         # get key and iv from PRIVATE.key
         with open('FILE.KEY', 'rb') as fp:
-            key = fp.readline()
-            iv = fp.readline()
+            key = fp.readline().replace(b'\n', b'')
+            iv = fp.readline().replace(b'\n', b'')
         # file encrypt
+        d[filename.replace('./File/', '')] = [int.from_bytes(key, 'big'), int.from_bytes(iv, 'big')]
         aes._file_encrypt(filename, tmpFile, key, iv)
         # send encrypted file
         clientSocket.send(tmp.encode('utf-8'))
@@ -77,9 +86,8 @@ def _client_upload(clientSocket):
         allFile.append(tmp.split('.')[0] + '.json')
         print('... Upload Finish: %s' % filename)
         print('... Upload Finish: %s' % ('./File/' + tmp.split('.')[0] + '.json'))
-        d[filename.replace('./File/', '')] = version
     with open('Record.json', 'w') as fp:
-        fp.write(dumps(d, indent=41))
+        fp.write(dumps(d, indent=4))
     return allFile
 
 
@@ -124,12 +132,15 @@ def _client_search(clientSocket, line):
     with open('Record.json', 'r') as fp:
         d = loads(fp.read())
         for filename in fileList:
-            KeyFolder = d[filename]
+            # KeyFolder = d[filename]
             tmpFile = './Search/' + filename.split('.')[0] + '_tmp.' + filename.split('.')[1]
+            key_int, iv_int = d[filename][0], d[filename][1]
+            key, iv = tobytes(key_int, 16), tobytes(iv_int, 16)
+            print(key, iv)
             # get aes's key and iv
-            with open(KeyFolder + '/FILE.KEY', 'rb') as fp:
-                key = fp.readline()
-                iv = fp.readline()
+            # with open(KeyFolder + '/FILE.KEY', 'rb') as fp:
+            #    key = fp.readline()
+            #     iv = fp.readline()
             aes._file_decrypt(tmpFile, './Search/' + filename, key, iv)
             os.remove(tmpFile)
     print('... search finish')
