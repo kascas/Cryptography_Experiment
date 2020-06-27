@@ -126,6 +126,28 @@ def _login_without_msgbox():
         return False
 
 
+def _register_():
+    global clientSocket
+    clientSocket.send('reg'.encode('utf-8'))
+    print('>>> register')
+    n = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    e = int(clientSocket.recv(1024).decode('utf-8'), 16)
+    name = RSAES_OAEP_E(n, e, username.get().encode('utf-8'))
+    pswd = RSAES_OAEP_E(n, e, password.get().encode('utf-8'))
+    clientSocket.send(name)
+    clientSocket.send(pswd)
+    result = clientSocket.recv(1024).decode('utf-8')
+    if result == 'success':
+        password_entry['state'] = 'disabled'
+        username_entry['state'] = 'disabled'
+        tkinter.messagebox.showinfo('note', 'register success')
+        return True
+    elif result == 'username already exists':
+        tkinter.messagebox.showinfo('note', 'username already exists')
+        _connect_without_msgbox()
+        return False
+
+
 def _upload_():
     clientSocket.send('1'.encode('utf-8'))
     uploadfile = []
@@ -190,7 +212,10 @@ password_label.place(x=240, y=192)
 password_entry.place(x=320, y=192)
 
 login_button = tk.Button(root, text="login", width="10", height=1, command=_login_)
-login_button.place(x=320, y=224)
+login_button.place(x=240, y=224)
+
+register_button = tk.Button(root, text="login", width="10", height=1, command=_register_)
+register_button.place(x=380, y=224)
 
 upload_button = tk.Button(root, text="Upload", width="10", height=1, command=_upload_)
 upload_button.place(x=240, y=480)

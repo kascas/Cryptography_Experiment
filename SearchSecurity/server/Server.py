@@ -129,8 +129,6 @@ def _server_register(clientSocket):
     with open('./User.json', 'r') as fp:
         text = fp.read()
     data = json.loads(text)
-    print(data)
-    print(username)
     if username in data:
         clientSocket.send('username already exists'.encode('utf-8'))
         clientSocket.close()
